@@ -1,0 +1,153 @@
+{
+  "events": [
+    {
+      "id": "email_phishing",
+      "title": "📧 PASSWORD RESET ALERT",
+      "location": "WORK AREA",
+      "trigger_tiles": [[2,11],[5,11],[8,11],[2,14],[5,14],[8,14]],
+      "trigger_type": "computer",
+      "narrative": [
+        "FROM: it-security@c0mpany.net",
+        "Your password EXPIRES in 24 hours!",
+        "Click the link NOW or lose access.",
+        "What will you do?"
+      ],
+      "choices": ["OPEN LINK", "REPORT IT", "VERIFY SENDER", "IGNORE"],
+      "correct": ["REPORT IT", "VERIFY SENDER"],
+      "wrong": ["OPEN LINK"],
+      "penalties": {
+        "OPEN LINK": {
+          "score": -10, "urgency_bias": 10, "mistakes": 1,
+          "message": "You fell for urgency manipulation! The domain 'c0mpany.net' was fake — attackers use fake deadlines to bypass rational thinking."
+        },
+        "IGNORE": {
+          "score": -3,
+          "message": "Ignoring is better than clicking, but reporting protects the whole team!"
+        }
+      },
+      "success_message": "Excellent! Verifying the sender domain revealed it was fake. Always check the full email address!",
+      "bias_tag": "Urgency Manipulation"
+    },
+    {
+      "id": "qr_phishing",
+      "title": "📋 CAFETERIA POSTER",
+      "location": "CAFETERIA",
+      "trigger_tiles": [[14,19]],
+      "trigger_type": "poster",
+      "narrative": [
+        "FREE HACKATHON CERTIFICATES!",
+        "Scan QR code to claim yours.",
+        "Sponsored by: hr-certs.xyz",
+        "Limited time — expires today!"
+      ],
+      "choices": ["SCAN QR CODE", "VERIFY SOURCE", "REPORT & IGNORE"],
+      "correct": ["VERIFY SOURCE", "REPORT & IGNORE"],
+      "wrong": ["SCAN QR CODE"],
+      "penalties": {
+        "SCAN QR CODE": {
+          "score": -5, "reward_bias": 10, "mistakes": 1,
+          "message": "Reward manipulation! The QR led to a credential-harvesting site. Attackers use prizes to bypass critical thinking."
+        }
+      },
+      "success_message": "Smart! Always verify QR codes. 'hr-certs.xyz' is not the company domain — classic impersonation.",
+      "bias_tag": "Reward Manipulation"
+    },
+    {
+      "id": "usb_drop",
+      "title": "💾 SUSPICIOUS USB FOUND",
+      "location": "WORK AREA",
+      "trigger_tiles": [[10,13]],
+      "trigger_type": "usb",
+      "narrative": [
+        "You spot a USB drive on the floor.",
+        "Label: 'Internship_Results_FINAL.zip'",
+        "It wasn't there this morning...",
+        "What will you do?"
+      ],
+      "choices": ["PLUG IN & OPEN", "SCAN WITH IT DEPT", "IGNORE & REPORT"],
+      "correct": ["SCAN WITH IT DEPT", "IGNORE & REPORT"],
+      "wrong": ["PLUG IN & OPEN"],
+      "penalties": {
+        "PLUG IN & OPEN": {
+          "score": -5, "authority_bias": 5, "fear_bias": 5, "mistakes": 1,
+          "message": "USB Drop Attack! Attackers plant baited drives. Yours just ran a keylogger. Never plug in unknown devices!"
+        }
+      },
+      "success_message": "Correct! USB drops are a classic physical attack. The IT team found malware inside — great instinct!",
+      "bias_tag": "Curiosity Bait (USB Drop)"
+    },
+    {
+      "id": "hr_message",
+      "title": "💻 URGENT HR MESSAGE",
+      "location": "HR ROOM",
+      "trigger_tiles": [[35,14]],
+      "trigger_type": "computer",
+      "narrative": [
+        "MANDATORY: Internship form due 5 PM!",
+        "Click here → hr-portal-forms.net",
+        "Failure to submit may affect record.",
+        "What will you do?"
+      ],
+      "choices": ["OPEN LINK", "VERIFY WITH HR", "REPORT IT"],
+      "correct": ["VERIFY WITH HR", "REPORT IT"],
+      "wrong": ["OPEN LINK"],
+      "penalties": {
+        "OPEN LINK": {
+          "score": -10, "authority_bias": 10, "mistakes": 1,
+          "message": "Authority phishing! 'hr-portal-forms.net' is not the company domain. Verify ALL HR requests directly in person."
+        }
+      },
+      "success_message": "Well done! HR confirmed they sent no such email. The link was a credential-harvesting page.",
+      "bias_tag": "Authority Phishing"
+    },
+    {
+      "id": "voice_phishing",
+      "title": "📞 INCOMING CALL",
+      "location": "HR ROOM",
+      "trigger_tiles": [[24,13]],
+      "trigger_type": "phone",
+      "narrative": [
+        "RING RING...",
+        "'IT Dept here. Unusual login detected.'",
+        "'Verify your identity — give us the OTP",
+        " sent to your phone. NOW please!'"
+      ],
+      "choices": ["SHARE OTP", "VERIFY CALLER", "HANG UP"],
+      "correct": ["VERIFY CALLER", "HANG UP"],
+      "wrong": ["SHARE OTP"],
+      "penalties": {
+        "SHARE OTP": {
+          "score": -15, "authority_bias": 15, "fear_bias": 10, "mistakes": 1,
+          "message": "Vishing attack! IT NEVER asks for OTPs by phone. Your account is now compromised. -15 points!"
+        }
+      },
+      "success_message": "Perfect! Legitimate IT staff NEVER ask for OTPs over the phone. You correctly identified vishing!",
+      "bias_tag": "Vishing (Voice Phishing)"
+    },
+    {
+      "id": "ceo_fraud",
+      "title": "🚨 CEO: URGENT REQUEST",
+      "location": "MEETING ROOM",
+      "trigger_tiles": [[23,23],[24,23],[25,23]],
+      "trigger_type": "computer",
+      "narrative": [
+        "FROM: ceo@company-secure-mail.net",
+        "CONFIDENTIAL — Do not discuss.",
+        "Approve $50,000 wire transfer NOW.",
+        "Reply with confirmation code."
+      ],
+      "choices": ["APPROVE TRANSFER", "CALL CEO DIRECTLY", "REPORT TO SECURITY", "CONSULT MANAGER"],
+      "correct": ["CALL CEO DIRECTLY", "REPORT TO SECURITY", "CONSULT MANAGER"],
+      "wrong": ["APPROVE TRANSFER"],
+      "penalties": {
+        "APPROVE TRANSFER": {
+          "score": -20, "authority_bias": 20, "urgency_bias": 10, "fear_bias": 5, "mistakes": 1,
+          "message": "CEO Fraud (BEC Attack)! $50,000 lost. The real CEO never emailed this. Always verify financial requests via phone!"
+        }
+      },
+      "success_message": "BOSS LEVEL CLEARED! You identified a Business Email Compromise attack. The CEO confirmed: they never sent this!",
+      "bias_tag": "BEC / CEO Fraud",
+      "is_final": true
+    }
+  ]
+}

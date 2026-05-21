@@ -1,0 +1,153 @@
+{
+  "events": [
+    {
+      "id": "email_phishing",
+      "title": "📧 PASSWORD RESET ALERT",
+      "location": "WORK AREA",
+      "trigger_tiles": [],
+      "trigger_type": "computer",
+      "narrative": [
+        "FROM: it-security@c0mpany.net",
+        "Your password EXPIRES in 24 hours!",
+        "Click NOW or lose ALL system access.",
+        "What will you do?"
+      ],
+      "choices": ["OPEN LINK", "REPORT IT", "VERIFY SENDER", "IGNORE"],
+      "correct": ["REPORT IT", "VERIFY SENDER"],
+      "wrong": ["OPEN LINK"],
+      "penalties": {
+        "OPEN LINK": {
+          "score": -10, "urgency_bias": 10, "mistakes": 1,
+          "message": "Urgency trap! 'c0mpany.net' is fake. Attackers use deadlines to bypass rational thinking. -10 points."
+        },
+        "IGNORE": {
+          "score": -3,
+          "message": "Ignoring is safer than clicking, but REPORTING protects the whole team!"
+        }
+      },
+      "success_message": "Excellent! Fake domain spotted. Always check the full sender address before acting.",
+      "bias_tag": "Urgency Manipulation"
+    },
+    {
+      "id": "qr_phishing",
+      "title": "📋 CAFETERIA POSTER",
+      "location": "CAFETERIA",
+      "trigger_tiles": [],
+      "trigger_type": "poster",
+      "narrative": [
+        "FREE HACKATHON CERTIFICATES!",
+        "Scan QR → claim yours instantly.",
+        "Sponsored by: hr-certs.xyz",
+        "Limited today only!"
+      ],
+      "choices": ["SCAN QR CODE", "VERIFY SOURCE", "REPORT & IGNORE"],
+      "correct": ["VERIFY SOURCE", "REPORT & IGNORE"],
+      "wrong": ["SCAN QR CODE"],
+      "penalties": {
+        "SCAN QR CODE": {
+          "score": -5, "reward_bias": 10, "mistakes": 1,
+          "message": "Reward manipulation! QR led to a credential-harvesting page. Never scan unverified codes."
+        }
+      },
+      "success_message": "Smart! 'hr-certs.xyz' is NOT the company domain — classic impersonation attack.",
+      "bias_tag": "Reward Manipulation"
+    },
+    {
+      "id": "usb_drop",
+      "title": "💾 SUSPICIOUS USB FOUND",
+      "location": "CAFETERIA",
+      "trigger_tiles": [],
+      "trigger_type": "usb",
+      "narrative": [
+        "A USB drive sits on the cafeteria table.",
+        "Label: 'Internship_Results_FINAL.zip'",
+        "Someone left it here deliberately?",
+        "What will you do?"
+      ],
+      "choices": ["PLUG IN & OPEN", "SCAN WITH IT DEPT", "IGNORE & REPORT"],
+      "correct": ["SCAN WITH IT DEPT", "IGNORE & REPORT"],
+      "wrong": ["PLUG IN & OPEN"],
+      "penalties": {
+        "PLUG IN & OPEN": {
+          "score": -5, "authority_bias": 5, "fear_bias": 5, "mistakes": 1,
+          "message": "USB Drop Attack! Attackers plant baited drives. Malware installed. Never plug unknown devices!"
+        }
+      },
+      "success_message": "Correct! IT found a keylogger inside. USB drops are a classic physical attack vector.",
+      "bias_tag": "Curiosity Bait (USB Drop)"
+    },
+    {
+      "id": "hr_message",
+      "title": "💻 URGENT HR MESSAGE",
+      "location": "HR ROOM",
+      "trigger_tiles": [],
+      "trigger_type": "computer",
+      "narrative": [
+        "MANDATORY: Submit internship form by 5PM!",
+        "Link: hr-portal-forms.net/submit",
+        "Failure to submit affects your record.",
+        "What will you do?"
+      ],
+      "choices": ["OPEN LINK", "VERIFY WITH HR", "REPORT IT"],
+      "correct": ["VERIFY WITH HR", "REPORT IT"],
+      "wrong": ["OPEN LINK"],
+      "penalties": {
+        "OPEN LINK": {
+          "score": -10, "authority_bias": 10, "mistakes": 1,
+          "message": "Authority phishing! 'hr-portal-forms.net' is fake. Always verify HR requests in person."
+        }
+      },
+      "success_message": "Great! HR confirmed no such email was sent. That link was a credential harvester.",
+      "bias_tag": "Authority Phishing"
+    },
+    {
+      "id": "voice_phishing",
+      "title": "📞 INCOMING CALL",
+      "location": "HR ROOM",
+      "trigger_tiles": [],
+      "trigger_type": "phone",
+      "narrative": [
+        "RING RING...",
+        "'IT Dept here. Unusual login detected.'",
+        "'Verify your identity — share your OTP",
+        " sent to your phone right now!'"
+      ],
+      "choices": ["SHARE OTP", "VERIFY CALLER", "HANG UP"],
+      "correct": ["VERIFY CALLER", "HANG UP"],
+      "wrong": ["SHARE OTP"],
+      "penalties": {
+        "SHARE OTP": {
+          "score": -15, "authority_bias": 15, "fear_bias": 10, "mistakes": 1,
+          "message": "Vishing! IT NEVER asks for OTPs by phone. Account compromised. -15 points!"
+        }
+      },
+      "success_message": "Perfect! Real IT staff never ask for OTPs over phone. You stopped a vishing attack!",
+      "bias_tag": "Vishing (Voice Phishing)"
+    },
+    {
+      "id": "ceo_fraud",
+      "title": "🚨 CEO: WIRE TRANSFER",
+      "location": "MEETING ROOM",
+      "trigger_tiles": [],
+      "trigger_type": "computer",
+      "narrative": [
+        "FROM: ceo@company-secure-mail.net",
+        "CONFIDENTIAL. Do NOT discuss.",
+        "Approve $50,000 wire transfer NOW.",
+        "Reply with your approval code."
+      ],
+      "choices": ["APPROVE TRANSFER", "CALL CEO DIRECTLY", "REPORT TO SECURITY", "CONSULT MANAGER"],
+      "correct": ["CALL CEO DIRECTLY", "REPORT TO SECURITY", "CONSULT MANAGER"],
+      "wrong": ["APPROVE TRANSFER"],
+      "penalties": {
+        "APPROVE TRANSFER": {
+          "score": -20, "authority_bias": 20, "urgency_bias": 10, "fear_bias": 5, "mistakes": 1,
+          "message": "CEO Fraud (BEC)! $50,000 lost. The real CEO never sent this. Always verify via phone!"
+        }
+      },
+      "success_message": "BOSS DEFEATED! Business Email Compromise identified. CEO confirmed: they never sent this email!",
+      "bias_tag": "BEC / CEO Fraud",
+      "is_final": true
+    }
+  ]
+}

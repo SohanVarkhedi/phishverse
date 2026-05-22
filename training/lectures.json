@@ -1,0 +1,155 @@
+{
+  "lectures": [
+    {
+      "lecture_id": "email_awareness",
+      "bias_target": "urgency",
+      "title": "Email Phishing Awareness",
+      "topic": "Recognising Urgency-Based Email Attacks",
+      "sections": [
+        {
+          "heading": "Urgent Login Requests",
+          "points": [
+            "Attackers exploit time pressure to disable rational thinking.",
+            "Common trigger phrases: 'Your account expires in 24 hours', 'Immediate action required'.",
+            "Legitimate services NEVER demand instant action through an unsolicited email.",
+            "Red flag combination: urgency + external link + unfamiliar sender domain.",
+            "Defence: navigate to the service directly — never via the email link."
+          ]
+        },
+        {
+          "heading": "Password Reset Scams",
+          "points": [
+            "Fake reset emails mimic real services with near-identical logos and layouts.",
+            "Check the sender domain carefully — 'c0mpany.net' is NOT 'company.com'.",
+            "Hover over links before clicking: the destination URL reveals the truth.",
+            "If you did not request a reset, report the email to IT immediately.",
+            "Real IT departments NEVER ask for your password through any channel."
+          ]
+        },
+        {
+          "heading": "Verification Methods",
+          "points": [
+            "Always verify by navigating to the official site in a new browser tab.",
+            "Call IT or HR directly using a number from the company directory — not the email.",
+            "Use multi-factor authentication: one compromised channel is not enough.",
+            "When in doubt, report and wait — the cost of checking is always zero."
+          ]
+        }
+      ]
+    },
+    {
+      "lecture_id": "ceo_fraud_awareness",
+      "bias_target": "authority",
+      "title": "CEO Fraud & HR Impersonation",
+      "topic": "Defending Against Authority-Based Social Engineering",
+      "sections": [
+        {
+          "heading": "Business Email Compromise (BEC)",
+          "points": [
+            "BEC is the costliest cyber attack type globally — billions lost annually.",
+            "Attackers spoof executive email addresses to authorise fraudulent transfers.",
+            "Domain spoofing: 'ceo@company-secure-mail.net' is NOT 'ceo@company.com'.",
+            "Urgent wire transfer requests from leadership are a classic BEC indicator.",
+            "Finance teams: ALWAYS verify payment requests via a direct phone callback."
+          ]
+        },
+        {
+          "heading": "Authority Manipulation Tactics",
+          "points": [
+            "Attackers impersonate CEOs, HR managers, IT staff, and external auditors.",
+            "They layer authority ('I am the CEO') with urgency ('NOW') and secrecy ('tell no one').",
+            "Requests for credentials, confidential data, or transfers are automatic red flags.",
+            "No legitimate executive will punish you for verifying an unusual request.",
+            "Social engineering exploits your deference to hierarchy — recognise that instinct."
+          ]
+        },
+        {
+          "heading": "Verification Workflows",
+          "points": [
+            "Call back the executive at their known directory number — not a number in the email.",
+            "Escalate unusual requests to your manager before taking any action.",
+            "Use a two-person authorisation rule for all financial transfers above a set threshold.",
+            "Report suspicious emails to your security team — even if the sender looks legitimate.",
+            "Trust the process, not the pressure."
+          ]
+        }
+      ]
+    },
+    {
+      "lecture_id": "qr_awareness",
+      "bias_target": "reward",
+      "title": "QR Phishing & Reward Baiting",
+      "topic": "Recognising Reward-Based Cyber Attacks",
+      "sections": [
+        {
+          "heading": "Fake Rewards & Prizes",
+          "points": [
+            "Reward baiting exploits curiosity and desire for gain to bypass critical thinking.",
+            "Common lures: free certificates, gift cards, prize draws, exclusive offers.",
+            "Ask yourself: did I enter this competition? Does this reward match my role?",
+            "Scarcity tactics — 'limited time', 'only 10 left' — are designed to rush decisions.",
+            "Legitimate employer rewards are communicated through official channels, not posters."
+          ]
+        },
+        {
+          "heading": "Malicious QR Codes",
+          "points": [
+            "QR codes cannot be read visually — you cannot see where they lead before scanning.",
+            "Attackers place fraudulent QR stickers over legitimate ones in public spaces.",
+            "A scanned QR code can open a phishing site, install malware, or pre-fill a payment.",
+            "Always check the full URL after scanning before tapping 'proceed'.",
+            "If the domain does not match the sponsoring organisation, do not proceed."
+          ]
+        },
+        {
+          "heading": "Scam Indicators",
+          "points": [
+            "Unofficial domain: 'hr-certs.xyz' is not your company's domain.",
+            "Requests for login credentials or personal details to 'claim' a reward.",
+            "Pressure to act immediately before the offer expires.",
+            "Reward amount disproportionately large relative to the action required.",
+            "Report suspicious QR codes and posters to your IT or facilities team."
+          ]
+        }
+      ]
+    },
+    {
+      "lecture_id": "vishing_awareness",
+      "bias_target": "fear",
+      "title": "Vishing & Fear Manipulation",
+      "topic": "Defending Against Voice Phishing Attacks",
+      "sections": [
+        {
+          "heading": "OTP Scams",
+          "points": [
+            "Vishers call pretending to be IT support, banks, or government agencies.",
+            "They claim a security incident occurred and need your OTP to 'verify' you.",
+            "OTPs are single-use codes proving YOU initiated an action — sharing one grants full access.",
+            "No legitimate IT, bank, or authority EVER asks for an OTP by phone.",
+            "If asked for an OTP: hang up immediately and call the organisation directly."
+          ]
+        },
+        {
+          "heading": "Threat Manipulation",
+          "points": [
+            "Fear is the strongest override of rational decision-making.",
+            "Threat phrases: 'Your account is compromised', 'Legal action will follow', 'You have 10 minutes'.",
+            "Attackers manufacture a crisis so that compliance feels like the only safe option.",
+            "Real emergencies give you time to verify — manufactured ones deliberately do not.",
+            "The more frightened a caller makes you feel, the more likely it is a scam."
+          ]
+        },
+        {
+          "heading": "Phone Verification",
+          "points": [
+            "Caller ID is trivially spoofed — a call appearing from 'IT Dept' may not be.",
+            "Always hang up and call back using a number from the official company directory.",
+            "Ask the caller for a ticket number or reference ID — legitimate staff always have one.",
+            "Never give passwords, PINs, OTPs, or personal details on an inbound call.",
+            "Report all suspicious calls to your security team — your report protects colleagues."
+          ]
+        }
+      ]
+    }
+  ]
+}

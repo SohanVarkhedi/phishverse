@@ -1,0 +1,25 @@
+{
+  "employee_id": "player",
+  "campaign": "finance_campaign",
+  "campaign_name": "Finance Protection",
+  "department": "Finance",
+  "score": 100,
+  "pass_score": 85,
+  "passed": true,
+  "urgency_bias": 0,
+  "authority_bias": 0,
+  "reward_bias": 0,
+  "fear_bias": 0,
+  "risk_level": "LOW",
+  "weakest_area": "Urgency Attacks",
+  "recommendation": "Excellent awareness! Keep up regular cyber training.",
+  "mistakes": 0,
+  "successful_reports": 2,
+  "completed_events": [
+    "ceo_fraud",
+    "email_phishing"
+  ],
+  "events_total": 2,
+  "events_completed": 2,
+  "timestamp": "2026-05-22T07:21:17.562186+00:00"
+}

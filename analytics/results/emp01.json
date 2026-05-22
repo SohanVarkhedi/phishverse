@@ -1,0 +1,27 @@
+{
+  "employee_id": "emp01",
+  "campaign": "hr_campaign",
+  "campaign_name": "HR Department Security Training",
+  "department": "HR",
+
+  "score": 85,
+  "pass_score": 80,
+  "passed": true,
+
+  "urgency_bias": 0,
+  "authority_bias": 10,
+  "reward_bias": 0,
+  "fear_bias": 5,
+
+  "risk_level": "LOW",
+  "weakest_area": "Authority Phishing",
+  "recommendation": "Moderate risk. Focus on: Authority Phishing.",
+  "mistakes": 1,
+  "successful_reports": 2,
+
+  "completed_events": ["email_phishing", "hr_message", "voice_phishing"],
+  "events_total": 3,
+  "events_completed": 3,
+
+  "timestamp": "2026-05-22T07:00:00+00:00"
+}

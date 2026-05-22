@@ -1,0 +1,52 @@
+{
+  "employee": {
+    "employee_name": "varkhedi",
+    "employee_id": "111",
+    "department": "Finance",
+    "role": ""
+  },
+  "campaign": "finance_campaign",
+  "campaign_name": "Finance Protection",
+  "date": "2026-05-22",
+  "score": 80,
+  "pass_score": 85,
+  "passed": false,
+  "risk": "LOW",
+  "biases": {
+    "urgency": 10,
+    "authority": 20,
+    "reward": 0,
+    "fear": 5
+  },
+  "weakness": {
+    "primary": "Authority Phishing",
+    "secondary": "Urgency Manipulation"
+  },
+  "training_progress": {
+    "events_total": 2,
+    "events_completed": 1,
+    "progress_pct": 50,
+    "completed_events": [
+      "ceo_fraud"
+    ]
+  },
+  "maturity": {
+    "level": "Secure",
+    "description": "You demonstrate solid security instincts.",
+    "score": 80
+  },
+  "lectures": {
+    "assigned": 0,
+    "completed": 0,
+    "pending": 0,
+    "progress_pct": 0,
+    "items": []
+  },
+  "recommendation": {
+    "next_lecture": "Executive Impersonation & BEC",
+    "suggested_topic": "Authority Phishing",
+    "exam_ready": false
+  },
+  "exam_status": "LOCKED",
+  "timestamp": "2026-05-22T12:34:10.401983+00:00"
+}

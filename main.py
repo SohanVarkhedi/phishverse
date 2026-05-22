@@ -12,10 +12,17 @@ from dialogue       import DialogBox
 from event_manager  import EventManager
 from events         import EventDatabase
 from risk_engine    import RiskEngine
-from ui             import HUD, PauseMenu, TitleScreen
+from ui             import HUD, PauseMenu, TitleScreen, CampaignSelectScreen, RegistrationScreen, DashboardScreen, LectureScreen, SemesterReportScreen, FinalExamScreen, CertificateScreen
+from reporting.semester_report import SemesterReport
+from exam.question_engine      import QuestionEngine
+from exam.final_exam           import ExamEngine, Certificate
+from training.lecture_engine import LectureEngine
+from ai import run_ai_analysis
 from report         import CyberResilienceReport
 from tiles          import TILE_DOOR
 from story          import StoryManager
+from analytics.result_store  import ResultStore
+from analytics.campaign_loader import CampaignLoader
 
 # Objectives are now managed by StoryManager (story.py).
 # This list is kept as a short fallback used only before StoryManager initialises.
@@ -75,7 +82,16 @@ class RoomFlash:
 class Game:
     START_TILE = (19, 2)
 
-    def __init__(self):
+    def __init__(self, campaign=None, employee_id: str = ""):
+        """
+        campaign    – a Campaign object from analytics.campaign_loader, or None
+                      for a free-play session (all events enabled).
+        employee_id – used when saving the campaign result file.
+        """
+        self._campaign    = campaign
+        self._employee_id = employee_id
+        self._employee: dict = {}
+
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption(TITLE)
@@ -88,6 +104,11 @@ class Game:
 
         self.risk   = RiskEngine()
         self.db     = EventDatabase()
+
+        # Apply campaign event filter if a campaign is active
+        if self._campaign is not None:
+            self.db.set_enabled_events(self._campaign.enabled_events)
+
         self.dialog = DialogBox(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.dialog.set_fonts(self.font, self.small)
 
@@ -108,8 +129,36 @@ class Game:
         self.title  = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.title.set_fonts(self.font, self.big, self.small)
 
+        # Employee registration screen
+        self.reg_screen = RegistrationScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.reg_screen.set_fonts(self.font, self.big, self.small)
+
+        # Campaign selection screen — loads all campaigns from campaigns/
+        self.camp_select = CampaignSelectScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.camp_select.set_fonts(self.font, self.big, self.small)
+        self.camp_select.set_campaigns(CampaignLoader.load_all())
+
         self.report = CyberResilienceReport(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.report.set_fonts(self.font, self.big, self.small)
+
+        self.dashboard = DashboardScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.dashboard.set_fonts(self.font, self.big, self.small)
+
+        self.lecture_screen = LectureScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.lecture_screen.set_fonts(self.font, self.big, self.small)
+
+        self.semester_screen = SemesterReportScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.semester_screen.set_fonts(self.font, self.big, self.small)
+
+        self.final_exam_screen = FinalExamScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.final_exam_screen.set_fonts(self.font, self.big, self.small)
+
+        self.cert_screen = CertificateScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.cert_screen.set_fonts(self.font, self.big, self.small)
+
+        self.q_engine         = QuestionEngine()
+        self._semester_report: dict = {}   # stored on game end for exam routing
+        self._exam_attempt    = 1          # increments on retake
 
         self.state     = STATE_TITLE
         self._obj_idx  = 0
@@ -156,8 +205,56 @@ class Game:
 
     # ── Callbacks ─────────────────────────────────────────────────────────────
     def _end_game(self):
-        self.report.set_data(self.risk.summary_dict())
+        # Build employee context (in-game registration takes precedence over CLI path)
+        emp = self._employee or {
+            "employee_name": self._employee_id or "Player",
+            "employee_id":   self._employee_id or "player",
+            "department":    "",
+            "role":          "",
+        }
+        # Merge employee fields into risk summary so report.py can render them
+        report_data = dict(self.risk.summary_dict())
+        report_data.update({
+            "employee_name": emp.get("employee_name", ""),
+            "employee_id":   emp.get("employee_id",   ""),
+            "department":    emp.get("department",     ""),
+            "role":          emp.get("role",           ""),
+            "campaign_name": self._campaign.name if self._campaign else "Free Play",
+        })
+        self.report.set_data(report_data)
         self.state = STATE_REPORT
+        # Generate and save semester report (available immediately on report screen)
+        semester = SemesterReport.generate(
+            emp, self._campaign, self.risk.summary_dict(),
+            list(self.ev_mgr._seen),
+        )
+        self.semester_screen.set_report(semester)
+        if emp.get("employee_id"):
+            SemesterReport.save(semester, emp["employee_id"])
+        self._semester_report = semester   # store for exam routing
+        self._exam_attempt    = 1          # reset on new game
+        # Persist campaign result
+        if self._campaign is not None:
+            ResultStore.save(
+                employee=emp,
+                campaign=self._campaign,
+                risk_summary=self.risk.summary_dict(),
+                completed_events=list(self.ev_mgr._seen),
+            )
+        # Assign lectures based on risk profile then load them into the screen
+        emp_id = emp.get("employee_id")
+        LectureEngine.assign_lectures(emp_id, self.risk.summary_dict())
+        self.lecture_screen.set_employee(emp_id)
+        # AI analysis — runs after rule-based systems; augments, does not replace
+        if emp_id:
+            run_ai_analysis(emp_id, self.risk.summary_dict())
+
+    def _apply_campaign(self, campaign):
+        """Apply a campaign chosen from the campaign select screen."""
+        self._campaign    = campaign
+        self._employee_id = self._employee.get("employee_id") or self._employee_id or "player"
+        self.db.set_enabled_events(campaign.enabled_events)
+        self.risk.total_threats = len(campaign.enabled_events)
 
     def _on_score(self, delta, good):
         cx = SCREEN_WIDTH//2 + random.randint(-50, 50)
@@ -238,22 +335,109 @@ class Game:
                 if ev.type == pygame.QUIT:
                     running = False
                 elif ev.type == pygame.KEYDOWN:
-                    running = self._key(ev.key, running)
+                    running = self._key(ev.key, running, ev.unicode)
             self._update()
             self._draw()
         pygame.quit()
         sys.exit()
 
-    # ── Key handler ───────────────────────────────────────────────────────────
-    def _key(self, key, running):
+    # ── Key handler ─────────────────────────────────────────────────────────────
+    def _key(self, key, running, unicode_char: str = ""):
         if self.state == STATE_TITLE:
             if self.title.handle_key(key):
+                # Title → Registration (reset form each visit)
+                self.reg_screen.reset()
+                self.state = STATE_REGISTRATION
+            return running
+
+        if self.state == STATE_REGISTRATION:
+            result = self.reg_screen.handle_key(key, unicode_char)
+            if result == "BACK":
+                self.state = STATE_TITLE
+            elif isinstance(result, dict):
+                self._employee    = result
+                self._employee_id = result["employee_id"]
+                if self._campaign is not None:
+                    # Campaign pre-assigned via CLI — skip selection screen
+                    self.risk.total_threats = len(self._campaign.enabled_events)
+                    self.state = STATE_EXPLORE
+                    self._room_flash.trigger(self._campaign.name.upper())
+                else:
+                    self.camp_select._slide_in = 0.0
+                    self.state = STATE_CAMPAIGN_SELECT
+            return running
+
+        if self.state == STATE_CAMPAIGN_SELECT:
+            result = self.camp_select.handle_key(key)
+            if result == "BACK":
+                self.state = STATE_REGISTRATION
+            elif result == "FREE_PLAY":
                 self.state = STATE_EXPLORE
-                self._room_flash.trigger("PHISHVERSE OFFICE")
+                self._room_flash.trigger("PHISHVERSE OFFICE  ·  FREE PLAY")
+            elif result is not None:        # Campaign object selected
+                self._apply_campaign(result)
+                self.state = STATE_EXPLORE
+                self._room_flash.trigger(result.name.upper())
             return running
 
         if self.state == STATE_REPORT:
-            if self.report.handle_key(key):
+            action = self.report.handle_key(key)
+            if action == "DASHBOARD":
+                self.state = STATE_SEMESTER_REPORT   # ENTER -> semester report card
+            elif action == "QUIT":
+                return False
+            return running
+
+        if self.state == STATE_SEMESTER_REPORT:
+            if key in (pygame.K_RETURN, pygame.K_e):
+                # Route: unlocked → Final Exam, locked → Lectures
+                if self._semester_report.get("exam_status") == "UNLOCKED":
+                    primary  = self._semester_report.get("weakness", {}).get("primary", "")
+                    questions = self.q_engine.select_questions(primary, n=10)
+                    self.final_exam_screen.start(questions, attempt=self._exam_attempt)
+                    self.state = STATE_FINAL_EXAM
+                else:
+                    self.state = STATE_LECTURES
+            elif key in (pygame.K_q, pygame.K_ESCAPE):
+                return False
+            return running
+
+        if self.state == STATE_FINAL_EXAM:
+            result = self.final_exam_screen.handle_key(key)
+            if result == "PASS":
+                # Generate + save certificate
+                emp     = self._employee or {"employee_id": self._employee_id or "player",
+                                              "employee_name": "", "department": "", "role": ""}
+                exam_r  = ExamEngine.build_result(
+                    emp, self.final_exam_screen.score_data, self._semester_report,
+                    attempt=self._exam_attempt,
+                )
+                ExamEngine.save_result(emp.get("employee_id", "player"), exam_r)
+                cert    = Certificate.generate(emp, exam_r)
+                Certificate.save(cert, emp.get("employee_id", "player"))
+                self.cert_screen.set_cert(cert)
+                self.state = STATE_CERTIFICATE
+            elif result == "FAIL":
+                self._exam_attempt += 1
+                self.state = STATE_LECTURES    # back to lectures before retake
+            elif result == "QUIT":
+                return False
+            return running
+
+        if self.state == STATE_CERTIFICATE:
+            if self.cert_screen.handle_key(key):
+                return False
+            return running
+
+        if self.state == STATE_LECTURES:
+            action = self.lecture_screen.handle_key(key)
+            if action == "CONTINUE":
+                self.dashboard.load_data()
+                self.state = STATE_DASHBOARD
+            return running
+
+        if self.state == STATE_DASHBOARD:
+            if self.dashboard.handle_key(key):
                 return False
             return running
 
@@ -281,10 +465,17 @@ class Game:
                 self.state = STATE_DIALOG
         return running
 
-    # ── Update ────────────────────────────────────────────────────────────────
+    # ── Update ─────────────────────────────────────────────────────────────
     def _update(self):
-        if self.state == STATE_TITLE:   self.title.update();  return
-        if self.state == STATE_REPORT:  self.report.update(); return
+        if self.state == STATE_TITLE:            self.title.update();            return
+        if self.state == STATE_REGISTRATION:     self.reg_screen.update();       return
+        if self.state == STATE_CAMPAIGN_SELECT:  self.camp_select.update();      return
+        if self.state == STATE_REPORT:           self.report.update();           return
+        if self.state == STATE_SEMESTER_REPORT:  self.semester_screen.update();     return
+        if self.state == STATE_FINAL_EXAM:        self.final_exam_screen.update();   return
+        if self.state == STATE_CERTIFICATE:       self.cert_screen.update();         return
+        if self.state == STATE_LECTURES:          self.lecture_screen.update();      return
+        if self.state == STATE_DASHBOARD:         self.dashboard.update();           return
         if self.state == STATE_DIALOG:
             self.dialog.update()
             if not self.dialog.active and self.state == STATE_DIALOG:
@@ -343,14 +534,28 @@ class Game:
         for p in self._popups: p.update()
         self._popups = [p for p in self._popups if p.alive]
 
-    # ── Draw ──────────────────────────────────────────────────────────────────
+    # ── Draw ─────────────────────────────────────────────────────────────
     def _draw(self):
         self.screen.fill((12, 12, 22))
 
         if self.state == STATE_TITLE:
-            self.title.draw(self.screen); pygame.display.flip(); return
+            self.title.draw(self.screen);            pygame.display.flip(); return
+        if self.state == STATE_REGISTRATION:
+            self.reg_screen.draw(self.screen);       pygame.display.flip(); return
+        if self.state == STATE_CAMPAIGN_SELECT:
+            self.camp_select.draw(self.screen);      pygame.display.flip(); return
         if self.state == STATE_REPORT:
-            self.report.draw(self.screen); pygame.display.flip(); return
+            self.report.draw(self.screen);           pygame.display.flip(); return
+        if self.state == STATE_SEMESTER_REPORT:
+            self.semester_screen.draw(self.screen);  pygame.display.flip(); return
+        if self.state == STATE_LECTURES:
+            self.lecture_screen.draw(self.screen);     pygame.display.flip(); return
+        if self.state == STATE_FINAL_EXAM:
+            self.final_exam_screen.draw(self.screen);  pygame.display.flip(); return
+        if self.state == STATE_CERTIFICATE:
+            self.cert_screen.draw(self.screen);        pygame.display.flip(); return
+        if self.state == STATE_DASHBOARD:
+            self.dashboard.draw(self.screen);          pygame.display.flip(); return
 
         # World
         self.gmap.draw(self.screen, self._dcx, self._dcy, SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -446,4 +651,18 @@ class Game:
 
 
 if __name__ == "__main__":
-    Game().run()
+    import argparse
+    _parser = argparse.ArgumentParser(description="PHISHVERSE")
+    _parser.add_argument("--campaign", default=None, help="Campaign ID to pre-load (skips in-game selection)")
+    _args, _ = _parser.parse_known_args()
+
+    _campaign = None
+    if _args.campaign:
+        try:
+            _campaign = CampaignLoader.load(_args.campaign)
+            print(f"[PHISHVERSE] Campaign loaded: {_campaign.name}")
+        except FileNotFoundError as e:
+            print(f"[PHISHVERSE] {e}")
+            print("[PHISHVERSE] Starting free play.")
+
+    Game(campaign=_campaign).run()

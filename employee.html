@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PHISHVERSE — Employee Portal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="styles.css" />
+
+<style>
+  /* employee-only styles */
+  .hero-mini {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    padding: 36px;
+    margin-bottom: 32px;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(24,232,255,0.15), transparent 50%),
+      linear-gradient(180deg, rgba(11,16,32,0.9), rgba(3,5,12,0.9));
+    border: 1px solid var(--line);
+  }
+  .hero-mini h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .hero-mini p { color: var(--muted); margin: 0; max-width: 540px; }
+
+  .cycle-progress {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .cycle-progress .step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    position: relative;
+  }
+  .cycle-progress .step::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+    margin-left: 4px;
+  }
+  .cycle-progress .step:last-child::after { display: none; }
+  .cycle-progress .step .dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--bg-2);
+    border: 1px solid var(--line-strong);
+    display: grid; place-items: center;
+    font-size: 10px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .cycle-progress .step.done .dot {
+    background: var(--green);
+    color: #001212;
+    border-color: var(--green);
+    box-shadow: 0 0 12px rgba(0,232,122,0.55);
+  }
+  .cycle-progress .step.active .dot {
+    background: var(--cyan);
+    color: #001218;
+    border-color: var(--cyan);
+    box-shadow: 0 0 14px var(--cyan);
+  }
+  .cycle-progress .step.active { color: var(--text); }
+  .cycle-progress .step.done { color: #C7D0E8; }
+
+  .screen { display: none; animation: rise 0.5s cubic-bezier(.2,.7,.2,1); }
+  .screen.show { display: block; }
+
+  /* Glass card central */
+  .glass-launch {
+    border-radius: var(--radius-lg);
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(24,232,255,0.05), rgba(168,85,247,0.05));
+    border: 1px solid rgba(24,232,255,0.18);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+  }
+  .glass-launch::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: var(--radius-lg);
+    background: conic-gradient(from 90deg, transparent, rgba(24,232,255,0.6), transparent 30%, transparent 70%, rgba(245,197,24,0.6), transparent);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    padding: 1px;
+    animation: spin 14s linear infinite;
+    opacity: 0.5;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .glass-launch .hex {
+    width: 100px; height: 100px;
+    margin: 0 auto 30px;
+    position: relative;
+    display: grid; place-items: center;
+  }
+  .glass-launch .hex svg { width: 100%; height: 100%; }
+  .glass-launch h2 {
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+  .glass-launch p { color: var(--muted); max-width: 480px; margin: 0 auto 32px; }
+
+  .launch-meta {
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .launch-meta b { color: var(--cyan); font-weight: 400; }
+
+  /* Gauge */
+  .gauge {
+    width: 260px;
+    height: 160px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .gauge svg { width: 100%; height: 100%; overflow: visible; }
+  .gauge-val {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  .gauge-val .n {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(180deg, var(--cyan), var(--teal));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .gauge-val .l {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .grid-two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 900px) {
+    .grid-two, .grid-three { grid-template-columns: 1fr; }
+  }
+
+  /* Bias bars block */
+  .bias-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 60px;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .bias-row:last-child { margin-bottom: 0; }
+  .bias-label { font-size: 13px; }
+  .bias-val { font-family: var(--font-mono); font-size: 12px; color: var(--cyan); text-align: right; }
+
+  /* Attack roster */
+  .attack-roster { display: flex; flex-direction: column; gap: 10px; }
+  .attack-row {
+    display: grid;
+    grid-template-columns: 30px 1fr auto 80px;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    background: rgba(239,243,255,0.02);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    transition: background 0.2s;
+  }
+  .attack-row:hover { background: rgba(239,243,255,0.05); }
+  .attack-row .num { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .attack-row .name { font-size: 14px; }
+  .attack-row .name small { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* Lecture modules */
+  .lecture-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 900px) { .lecture-grid { grid-template-columns: 1fr; } }
+
+  .lecture-card {
+    padding: 28px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(180deg, rgba(11,16,32,0.7), rgba(3,5,12,0.5));
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .lecture-card.locked { opacity: 0.55; }
+  .lecture-card:not(.locked):hover { transform: translateY(-4px); border-color: var(--line-strong); }
+  .lecture-card .lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(3,5,12,0.55);
+    backdrop-filter: blur(2px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .lecture-card.locked .lock-overlay { display: flex; }
+  .lecture-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .lecture-card h3 { font-size: 22px; margin-bottom: 10px; font-family: var(--font-display); }
+  .lecture-card p { color: var(--muted); font-size: 14px; margin: 0 0 22px; }
+  .lecture-meta { display: flex; justify-content: space-between; padding-top: 18px; border-top: 1px solid var(--line); align-items: center; }
+  .lecture-meta .left { display: flex; gap: 10px; align-items: center; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+
+  /* MCQ */
+  .mcq-card { padding: 36px; }
+  .mcq-q { font-size: 22px; font-family: var(--font-display); margin-bottom: 24px; line-height: 1.3; }
+  .mcq-opts { display: flex; flex-direction: column; gap: 10px; }
+  .mcq-opt {
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(239,243,255,0.02);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: none;
+    transition: background 0.2s, border-color 0.2s;
+    text-align: left;
+    font-family: inherit;
+    color: var(--text);
+    width: 100%;
+    font-size: 14px;
+  }
+  .mcq-opt .bullet {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    background: rgba(239,243,255,0.04);
+    border: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .mcq-opt:hover { border-color: var(--line-strong); background: rgba(239,243,255,0.04); }
+  .mcq-opt.selected { border-color: var(--cyan); background: rgba(24,232,255,0.06); }
+  .mcq-opt.selected .bullet { background: var(--cyan); color: #001218; border-color: var(--cyan); }
+  .mcq-opt.correct { border-color: var(--green); background: rgba(0,232,122,0.06); }
+  .mcq-opt.correct .bullet { background: var(--green); color: #001212; border-color: var(--green); }
+  .mcq-opt.wrong { border-color: var(--red); background: rgba(255,61,87,0.06); }
+  .mcq-opt.wrong .bullet { background: var(--red); color: #20010A; border-color: var(--red); }
+
+  .mcq-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* Certificate */
+  .cert-frame {
+    position: relative;
+    padding: 60px;
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(circle at 30% 10%, rgba(245,197,24,0.10), transparent 60%),
+      linear-gradient(180deg, rgba(11,16,32,0.9), rgba(3,5,12,0.95));
+    border: 1px solid rgba(245,197,24,0.4);
+    overflow: hidden;
+    box-shadow: 0 30px 80px -30px rgba(245,197,24,0.25);
+  }
+  .cert-frame::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(245,197,24,0.2);
+    border-radius: calc(var(--radius-lg) - 6px);
+    pointer-events: none;
+  }
+  .cert-frame .seal {
+    position: absolute;
+    top: 30px; right: 30px;
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    border: 1px solid rgba(245,197,24,0.5);
+    display: grid; place-items: center;
+    color: var(--gold);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+    background: rgba(245,197,24,0.06);
+  }
+  .cert-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .cert-name {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 6vw, 64px);
+    line-height: 1;
+    margin: 10px 0 18px;
+    background: linear-gradient(180deg, #FFFFFF, #FFD66B);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .cert-body { color: #C7D0E8; max-width: 600px; font-size: 16px; }
+  .cert-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(245,197,24,0.2);
+  }
+  .cert-meta .cell .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .cert-meta .cell .v { font-size: 14px; }
+  @media (max-width: 700px) { .cert-meta { grid-template-columns: 1fr 1fr; } .cert-frame { padding: 36px 26px; } }
+
+  /* Hamburger */
+  .hamb {
+    display: none;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    place-items: center;
+  }
+  @media (max-width: 760px) { .hamb { display: grid; } }
+</style>
+</head>
+<body>
+
+<div class="portal-shell">
+
+  <!-- ───── Sidebar ───── -->
+  <aside class="sidebar">
+    <a href="index.html" class="brand">
+      <span class="brand-mark"></span>
+      <span>PHISHVERSE</span>
+    </a>
+
+    <div class="sidebar-section">Cycle 2026.Q2</div>
+    <a href="#registration" class="sidebar-link nav-item" data-screen="registration">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+      Registration
+      <span class="badge done">✓</span>
+    </a>
+    <a href="#campaigns" class="sidebar-link nav-item" data-screen="campaigns">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+      Campaigns
+      <span class="badge done">✓</span>
+    </a>
+    <a href="#exam" class="sidebar-link nav-item active" data-screen="exam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 11l3 3 8-8"/><path d="M21 12v6a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h11"/></svg>
+      Entrance Exam
+      <span class="badge active">Now</span>
+    </a>
+    <a href="#lectures" class="sidebar-link nav-item locked" data-screen="lectures">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+      Lectures
+      <span class="badge">Locked</span>
+    </a>
+    <a href="#report" class="sidebar-link nav-item locked" data-screen="report">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+      Semester Report
+      <span class="badge">Locked</span>
+    </a>
+    <a href="#final" class="sidebar-link nav-item locked" data-screen="final">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M21 14l-9 5-9-5"/></svg>
+      Final Exam
+      <span class="badge">Locked</span>
+    </a>
+    <a href="#certificate" class="sidebar-link nav-item locked" data-screen="certificate">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="9" r="6"/><path d="M9 14l-2 7 5-3 5 3-2-7"/></svg>
+      Certificate
+      <span class="badge">Locked</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="avatar" id="sidebarAvatar">EM</div>
+      <div>
+        <div class="name" id="sidebarName">Employee</div>
+        <div class="role" id="sidebarRole">Trainee</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ───── Main ───── -->
+  <main class="portal-main">
+
+    <div class="portal-topbar">
+      <div style="display:flex; gap:14px; align-items:center;">
+        <button class="hamb" onclick="PV.toggleSidebar()" aria-label="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <div class="crumbs">
+          <span>Employee</span><span class="sep">/</span>
+          <span>Cycle 2026.Q2</span><span class="sep">/</span>
+          <span class="cur" id="crumbCur">Entrance Exam</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div class="search-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <span>Search modules, lectures…</span>
+          <kbd>⌘K</kbd>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero strip with progress -->
+    <div class="hero-mini reveal">
+      <span class="tag cyan">CYCLE&nbsp;PROGRESS · STAGE&nbsp;03</span>
+      <h2 style="margin-top:16px;">Welcome, Trainee.</h2>
+      <p>Complete the entrance exam to generate your AI-curated risk profile and unlock the lecture plan.</p>
+
+      <div class="cycle-progress">
+        <div class="step done"><span class="dot">✓</span>Registration</div>
+        <div class="step done"><span class="dot">✓</span>Campaign</div>
+        <div class="step active"><span class="dot">3</span>Entrance Exam</div>
+        <div class="step"><span class="dot">4</span>AI Training</div>
+        <div class="step"><span class="dot">5</span>Semester Report</div>
+        <div class="step"><span class="dot">6</span>Final MCQ</div>
+        <div class="step"><span class="dot">7</span>Certificate</div>
+      </div>
+    </div>
+
+    <!-- ────── REGISTRATION ────── -->
+    <section class="screen" id="screen-registration">
+      <div class="page-head">
+        <div>
+          <span class="tag green">STAGE&nbsp;01 · COMPLETE</span>
+          <h1 style="margin-top:14px;">Registration</h1>
+          <p class="lede">Your enrolment in the 2026.Q2 PHISHVERSE cycle is confirmed. SSO and HR records are synced.</p>
+        </div>
+      </div>
+
+      <div class="grid-two">
+        <div class="card">
+          <div class="card-head"><div><h3>Profile</h3><span class="sub">Synced from Okta · 2 min ago</span></div><span class="tag green">VERIFIED</span></div>
+          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 18px 22px;">
+            <div><div class="sub" style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">FULL NAME</div><div id="regName">—</div></div>
+            <div><div class="sub" style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">DEPARTMENT</div><div id="regDept">—</div></div>
+            <div><div class="sub" style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">EMPLOYEE&nbsp;ID</div><div class="mono" id="regId">—</div></div>
+            <div><div class="sub" style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">CYCLE</div><div class="mono">2026.Q2</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Consent &amp; Privacy</h3><span class="sub">GDPR · ISO 27001</span></div></div>
+          <p style="color: var(--muted); font-size: 14px;">Behavioural telemetry is anonymised before being used to train your personal risk profile. Raw click data is purged after 90 days.</p>
+          <div style="display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;">
+            <span class="tag muted">Telemetry · Allowed</span>
+            <span class="tag muted">Marketing · Disabled</span>
+            <span class="tag muted">Export · On request</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── CAMPAIGNS ────── -->
+    <section class="screen" id="screen-campaigns">
+      <div class="page-head">
+        <div>
+          <span class="tag green">STAGE&nbsp;02 · COMPLETE</span>
+          <h1 style="margin-top:14px;">Active Campaigns</h1>
+          <p class="lede">Live attack simulations targeting your cohort. Your responses are silently logged to build your bias profile.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head"><div><h3>Q2 Treasury Cohort · Wave 04</h3><span class="sub">Authored by AI · Industry: Banking</span></div><span class="tag cyan">RUNNING</span></div>
+
+        <div class="attack-roster">
+          <div class="attack-row">
+            <span class="num">01</span>
+            <div class="name">CFO Wire Request<small>Spoof of internal exec.principal — replied 0/14</small></div>
+            <span class="tag red">CRITICAL</span>
+            <span class="mono" style="color:var(--green);">PASS</span>
+          </div>
+          <div class="attack-row">
+            <span class="num">02</span>
+            <div class="name">Vendor Invoice Update<small>Banking detail change · prompt-engineered urgency</small></div>
+            <span class="tag gold">HIGH</span>
+            <span class="mono" style="color:var(--green);">PASS</span>
+          </div>
+          <div class="attack-row">
+            <span class="num">03</span>
+            <div class="name">Helpdesk MFA Reset<small>Voice clone vishing · 47s engagement</small></div>
+            <span class="tag purple">VISHING</span>
+            <span class="mono" style="color:var(--red);">FAIL</span>
+          </div>
+          <div class="attack-row">
+            <span class="num">04</span>
+            <div class="name">Café Wi-Fi QR<small>Quishing landing page · OAuth abuse</small></div>
+            <span class="tag teal">QUISHING</span>
+            <span class="mono" style="color:var(--red);">FAIL</span>
+          </div>
+          <div class="attack-row">
+            <span class="num">05</span>
+            <div class="name">HR Bonus Distribution<small>Authority + reward trigger · deadline framing</small></div>
+            <span class="tag gold">HIGH</span>
+            <span class="mono" style="color:var(--green);">PASS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-three">
+        <div class="card" style="text-align:center;">
+          <div class="stat-value" style="font-size:48px; color:var(--cyan);">14</div>
+          <div class="stat-label">Simulations delivered</div>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div class="stat-value" style="font-size:48px; color:var(--green);">9</div>
+          <div class="stat-label">Successfully refused</div>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div class="stat-value" style="font-size:48px; color:var(--red);">5</div>
+          <div class="stat-label">Engaged · learning gaps</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── ENTRANCE EXAM ────── -->
+    <section class="screen show" id="screen-exam">
+      <div class="page-head">
+        <div>
+          <span class="tag cyan">STAGE&nbsp;03 · IN&nbsp;PROGRESS</span>
+          <h1 style="margin-top:14px;">Entrance Exam</h1>
+          <p class="lede">Run the immersive PHISHVERSE simulation. The engine will profile your decisions across six attack vectors to seed your training plan.</p>
+        </div>
+        <div class="page-head-actions">
+          <a class="btn ghost sm" href="#">View Briefing</a>
+        </div>
+      </div>
+
+      <div class="glass-launch reveal">
+        <div class="hex">
+          <svg viewBox="0 0 100 100" fill="none">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#18E8FF"/>
+                <stop offset="100%" stop-color="#A855F7"/>
+              </linearGradient>
+            </defs>
+            <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="url(#g1)" stroke-width="1.5"/>
+            <polygon points="50,18 79,34 79,66 50,82 21,66 21,34" fill="rgba(24,232,255,0.06)" stroke="rgba(24,232,255,0.4)" stroke-width="1"/>
+            <polygon points="50,32 67,42 67,58 50,68 33,58 33,42" fill="rgba(245,197,24,0.15)" stroke="var(--gold)" stroke-width="1.4"/>
+            <circle cx="50" cy="50" r="4" fill="var(--gold)"/>
+          </svg>
+        </div>
+        <span class="eyebrow" style="justify-content:center;">PHISHVERSE&nbsp;RPG · LIVE&nbsp;SESSION</span>
+        <h2>Launch the simulation.</h2>
+        <p>Step into a 12-minute immersive scenario where you'll receive emails, calls, and walk-ups from synthetic threat actors. Your every hesitation trains the model.</p>
+
+        <button class="btn primary" style="font-size:15px; padding:16px 32px;" id="launchBtn">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6,4 20,12 6,20"/></svg>
+          Launch PHISHVERSE
+          <svg class="btn-icon arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+
+        <div class="launch-meta">
+          <div><b>~12 MIN</b><div>SESSION&nbsp;LENGTH</div></div>
+          <div><b>6 VECTORS</b><div>ATTACK&nbsp;TYPES</div></div>
+          <div><b>NO&nbsp;PENALTY</b><div>FAILURE&nbsp;IS&nbsp;DATA</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── LECTURES ────── -->
+    <section class="screen" id="screen-lectures">
+      <div class="page-head">
+        <div>
+          <span class="tag purple">STAGE&nbsp;04 · AI&nbsp;TRAINING</span>
+          <h1 style="margin-top:14px;">Lectures</h1>
+          <p class="lede">Four micro-modules tuned to your specific bias profile. Complete every section to unlock the Final Exam.</p>
+        </div>
+        <div class="page-head-actions">
+          <div class="tag cyan">PROGRESS · 1 / 4</div>
+        </div>
+      </div>
+
+      <div class="lecture-grid">
+        <article class="lecture-card">
+          <div class="lecture-num">MODULE&nbsp;01</div>
+          <h3>Why You Fell For It</h3>
+          <p>A frame-by-frame replay of your three engagement events with PHISHVERSE attackers, annotated with the trigger that worked.</p>
+          <div class="lecture-meta">
+            <div class="left"><span>12 MIN</span><span>·</span><span>4 CHAPTERS</span></div>
+            <a href="#" class="btn sm primary" onclick="continueLecture(this); return false;">
+              Continue
+              <svg class="btn-icon arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
+
+        <article class="lecture-card locked">
+          <div class="lecture-num">MODULE&nbsp;02</div>
+          <h3>Attacker Psychology</h3>
+          <p>How real threat actors weaponise authority, scarcity, reward, and fear to compress your judgement window.</p>
+          <div class="lecture-meta">
+            <div class="left"><span>09 MIN</span><span>·</span><span>3 CHAPTERS</span></div>
+            <a href="#" class="btn sm ghost">Locked</a>
+          </div>
+          <div class="lock-overlay">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="11" width="12" height="10" rx="1"/><path d="M9 11V8a3 3 0 016 0v3"/></svg>
+            Complete Module 01
+          </div>
+        </article>
+
+        <article class="lecture-card locked">
+          <div class="lecture-num">MODULE&nbsp;03</div>
+          <h3>STOP · VERIFY · ACT</h3>
+          <p>The three-step protocol used by SOC operators worldwide. Drill it until it's reflex.</p>
+          <div class="lecture-meta">
+            <div class="left"><span>15 MIN</span><span>·</span><span>5 CHAPTERS</span></div>
+            <a href="#" class="btn sm ghost">Locked</a>
+          </div>
+          <div class="lock-overlay">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="11" width="12" height="10" rx="1"/><path d="M9 11V8a3 3 0 016 0v3"/></svg>
+            Complete Module 02
+          </div>
+        </article>
+
+        <article class="lecture-card locked">
+          <div class="lecture-num">MODULE&nbsp;04</div>
+          <h3>Strengths</h3>
+          <p>Where your instincts already win. Lock these in and lean on them under live pressure.</p>
+          <div class="lecture-meta">
+            <div class="left"><span>07 MIN</span><span>·</span><span>2 CHAPTERS</span></div>
+            <a href="#" class="btn sm ghost">Locked</a>
+          </div>
+          <div class="lock-overlay">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="11" width="12" height="10" rx="1"/><path d="M9 11V8a3 3 0 016 0v3"/></svg>
+            Complete Module 03
+          </div>
+        </article>
+      </div>
+
+      <div style="margin-top: 28px; display:flex; justify-content:flex-end;">
+        <button class="btn primary" id="toReportBtn" disabled style="opacity:0.5;">
+          Continue to Semester Report
+          <svg class="btn-icon arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ────── REPORT ────── -->
+    <section class="screen" id="screen-report">
+      <div class="page-head">
+        <div>
+          <span class="tag gold">STAGE&nbsp;05 · DEBRIEF</span>
+          <h1 style="margin-top:14px;">Semester Report</h1>
+          <p class="lede">Enter your Employee ID to load your real game results.</p>
+        </div>
+        <div class="page-head-actions">
+          <button class="btn ghost sm">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Export PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Load results form -->
+      <div class="card" style="margin-bottom:20px; padding:24px;">
+        <div class="card-head"><div><h3>Load My Results</h3><span class="sub">Enter the Employee ID you used in the game</span></div></div>
+        <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+          <input class="input" id="resultIdInput" placeholder="e.g. EMP001" style="flex:1; min-width:180px;" />
+          <button class="btn primary sm" id="loadResultsBtn">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/></svg>
+            Load Results
+          </button>
+        </div>
+        <div id="resultLoadMsg" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.14em;color:var(--muted);margin-top:10px;"></div>
+      </div>
+
+      <div class="grid-two">
+        <div class="card">
+          <div class="card-head"><div><h3>Cyber Score</h3><span class="sub">Composite · vs. cohort median</span></div><span class="tag green" id="scoreDelta">Cycle 2026.Q2</span></div>
+          <div class="gauge">
+            <svg viewBox="0 0 260 160">
+              <defs>
+                <linearGradient id="gaugeG" x1="0" x2="1">
+                  <stop offset="0" stop-color="var(--red)"/>
+                  <stop offset="0.5" stop-color="var(--gold)"/>
+                  <stop offset="1" stop-color="var(--green)"/>
+                </linearGradient>
+              </defs>
+              <path d="M 30 140 A 100 100 0 0 1 230 140" fill="none" stroke="rgba(239,243,255,0.08)" stroke-width="14" stroke-linecap="round"/>
+              <path d="M 30 140 A 100 100 0 0 1 230 140" fill="none" stroke="url(#gaugeG)" stroke-width="14" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="69" style="transition: stroke-dashoffset 1.4s cubic-bezier(.2,.7,.2,1);"/>
+              <circle cx="200" cy="74" r="6" fill="var(--cyan)" />
+            </svg>
+            <div class="gauge-val"><div class="n">78</div><div class="l">CYBER SCORE</div></div>
+          </div>
+          <div style="display:flex; justify-content: space-between; margin-top: 18px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--muted);">
+            <span>HIGH RISK</span><span>STABLE</span><span>HARDENED</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Bias Profile</h3><span class="sub">Vulnerability to manipulation triggers</span></div></div>
+
+          <div class="bias-row">
+            <span class="bias-label">Urgency</span>
+            <div class="bar"><div class="bar-fill red" data-w="72"></div></div>
+            <span class="bias-val" style="color:var(--red);">72</span>
+          </div>
+          <div class="bias-row">
+            <span class="bias-label">Authority</span>
+            <div class="bar"><div class="bar-fill gold" data-w="58"></div></div>
+            <span class="bias-val" style="color:var(--gold);">58</span>
+          </div>
+          <div class="bias-row">
+            <span class="bias-label">Reward</span>
+            <div class="bar"><div class="bar-fill purple" data-w="44"></div></div>
+            <span class="bias-val" style="color:var(--purple);">44</span>
+          </div>
+          <div class="bias-row">
+            <span class="bias-label">Fear</span>
+            <div class="bar"><div class="bar-fill green" data-w="22"></div></div>
+            <span class="bias-val" style="color:var(--green);">22</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="card-head"><div><h3>Attack Roster · Pass / Fail</h3><span class="sub">14 simulations · 9 refused</span></div></div>
+        <div class="attack-roster">
+          <div class="attack-row"><span class="num">·</span><div class="name">Email Phishing<small>4 simulations</small></div><span class="tag green">PASS</span><span class="mono" style="color:var(--green);">4/4</span></div>
+          <div class="attack-row"><span class="num">·</span><div class="name">CEO Fraud<small>2 simulations</small></div><span class="tag green">PASS</span><span class="mono" style="color:var(--green);">2/2</span></div>
+          <div class="attack-row"><span class="num">·</span><div class="name">Vishing<small>3 simulations</small></div><span class="tag red">FAIL</span><span class="mono" style="color:var(--red);">0/3</span></div>
+          <div class="attack-row"><span class="num">·</span><div class="name">QR Phishing<small>2 simulations</small></div><span class="tag red">FAIL</span><span class="mono" style="color:var(--red);">0/2</span></div>
+          <div class="attack-row"><span class="num">·</span><div class="name">USB Attack<small>1 simulation</small></div><span class="tag green">PASS</span><span class="mono" style="color:var(--green);">1/1</span></div>
+          <div class="attack-row"><span class="num">·</span><div class="name">HR Authority<small>2 simulations</small></div><span class="tag gold">PARTIAL</span><span class="mono" style="color:var(--gold);">2/2</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px; background: radial-gradient(circle at 100% 0%, rgba(168,85,247,0.10), transparent 60%), linear-gradient(180deg, rgba(11,16,32,0.7), rgba(3,5,12,0.5));">
+        <div class="card-head"><div><h3>AI Debrief</h3><span class="sub">Auto-written · Reviewed by PHISHVERSE engine</span></div><span class="tag purple">GPT&nbsp;ENGINE</span></div>
+        <p class="mono" id="aiDebriefText" style="font-size:13px; line-height:1.9; color: #C7D0E8; letter-spacing:0.02em;">
+          <span style="color:var(--cyan);">&gt;</span> Enter your Employee ID below to load your personal AI debrief.<br/>
+          <span style="color:var(--cyan);">&gt;</span> Results are generated automatically when your game session ends.<br/>
+          <span style="color:var(--cyan);">&gt;</span> If you just completed the game, click <span style="color:var(--gold);">Load My Results</span> in the card above.
+        </p>
+      </div>
+    </section>
+
+    <!-- ────── FINAL EXAM ────── -->
+    <section class="screen" id="screen-final">
+      <div class="page-head">
+        <div>
+          <span class="tag cyan">STAGE&nbsp;06 · ADAPTIVE&nbsp;MCQ</span>
+          <h1 style="margin-top:14px;">Final Exam</h1>
+          <p class="lede">Twelve adaptive questions calibrated to your bias profile. Pass to unlock your certificate.</p>
+        </div>
+      </div>
+
+      <div class="card mcq-card">
+        <div class="mcq-progress">
+          <span>QUESTION&nbsp;<span id="qNum">04</span> / 12</span>
+          <span>BIAS&nbsp;FOCUS · URGENCY · AUTHORITY</span>
+          <span id="qTimer">00:42</span>
+        </div>
+        <div class="bar" style="margin-bottom:32px;"><div class="bar-fill" style="width:33%;"></div></div>
+
+        <div class="mcq-q" id="qText">A caller claiming to be from "IT Helpdesk" insists your VPN cert is about to expire and asks for your 6-digit MFA code over the phone. What's the correct move?</div>
+
+        <div class="mcq-opts">
+          <button class="mcq-opt" data-correct="false"><span class="bullet">A</span>Read out the code so the cert doesn't break my morning meeting.</button>
+          <button class="mcq-opt" data-correct="false"><span class="bullet">B</span>Ask for their employee number, then read the code.</button>
+          <button class="mcq-opt" data-correct="true"><span class="bullet">C</span>Hang up. Call IT back on the official internal number. Never share MFA codes.</button>
+          <button class="mcq-opt" data-correct="false"><span class="bullet">D</span>Send a screenshot of the code via Slack to verify identity.</button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);">
+          <button class="btn ghost sm">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Previous
+          </button>
+          <span class="mono" style="font-size:11px; letter-spacing:0.16em; color:var(--muted);">PASS THRESHOLD · 9 / 12</span>
+          <button class="btn primary sm" id="nextQ">
+            Next Question
+            <svg class="btn-icon arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── CERTIFICATE ────── -->
+    <section class="screen" id="screen-certificate">
+      <div class="page-head">
+        <div>
+          <span class="tag gold">STAGE&nbsp;07 · CERTIFIED</span>
+          <h1 style="margin-top:14px;">Certificate</h1>
+          <p class="lede">A verifiable credential, signed by your organisation and the PHISHVERSE root. Shareable on LinkedIn and exportable to Verifiable Credentials wallets.</p>
+        </div>
+        <div class="page-head-actions">
+          <button class="btn ghost sm">Share</button>
+          <button class="btn gold sm">Download PDF</button>
+        </div>
+      </div>
+
+      <div class="cert-frame reveal">
+        <div class="seal">PHISH·<br/>VERSE</div>
+        <div class="cert-eyebrow">CERTIFICATE&nbsp;OF&nbsp;COMPLETION</div>
+        <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted);">This is to certify that</div>
+        <div class="cert-name" id="certName">—</div>
+        <p class="cert-body">has successfully completed the PHISHVERSE Cycle 2026.Q2 cyber awareness program — passing the entrance exam, four AI-curated lectures, and a 12-question adaptive final exam.</p>
+
+        <div class="cert-meta">
+          <div class="cell"><div class="k">Cycle</div><div class="v">2026.Q2</div></div>
+          <div class="cell"><div class="k">Final Score</div><div class="v">87 / 100</div></div>
+          <div class="cell"><div class="k">Issued</div><div class="v">22 May 2026</div></div>
+          <div class="cell"><div class="k">Credential ID</div><div class="v mono" style="font-size:12px;">CERT-PV-0420F</div></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ────── Game Launch Modal ────── -->
+<div class="modal-backdrop" id="launchModal">
+  <div class="modal">
+    <button class="modal-close" onclick="PV.closeModal('launchModal')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <span class="tag cyan">CONFIRM&nbsp;LAUNCH</span>
+    <h3 style="margin-top:14px;">Enter the PHISHVERSE.</h3>
+    <p>You're about to start a 12-minute live simulation. Once launched, your session is logged for AI debriefing. There is no penalty for failure — failure is training data.</p>
+    <div style="display:flex; flex-direction:column; gap:14px; margin-top: 24px;">
+      <div style="display:flex; justify-content:space-between; padding:14px 18px; background: rgba(239,243,255,0.03); border:1px solid var(--line); border-radius:10px; font-family:var(--font-mono); font-size:12px; letter-spacing:0.1em;">
+        <span style="color:var(--muted);">SESSION ID</span>
+        <span class="mono" id="sessionId" style="color:var(--cyan);">PV-AWAITING</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:14px 18px; background: rgba(239,243,255,0.03); border:1px solid var(--line); border-radius:10px; font-family:var(--font-mono); font-size:12px; letter-spacing:0.1em;">
+        <span style="color:var(--muted);">DURATION</span>
+        <span class="mono" style="color:var(--text);">~12 MIN · 6 VECTORS</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost sm" onclick="PV.closeModal('launchModal')">Not yet</button>
+      <button class="btn primary sm" id="confirmLaunch">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6,4 20,12 6,20"/></svg>
+        Enter simulation
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  // ─── Sidebar navigation ───
+  const navItems = document.querySelectorAll('.nav-item');
+  const screens = document.querySelectorAll('.screen');
+  const labels = {
+    registration: 'Registration', campaigns: 'Campaigns', exam: 'Entrance Exam',
+    lectures: 'Lectures', report: 'Semester Report', final: 'Final Exam', certificate: 'Certificate'
+  };
+
+  function showScreen(name) {
+    screens.forEach(s => s.classList.toggle('show', s.id === 'screen-' + name));
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.screen === name));
+    document.getElementById('crumbCur').textContent = labels[name] || name;
+    // re-trigger reveal anims inside newly-shown screen
+    const active = document.querySelector('.screen.show');
+    if (active) {
+      active.querySelectorAll('.reveal').forEach(el => { el.classList.remove('in'); requestAnimationFrame(() => el.classList.add('in')); });
+      // animate bar fills inside it
+      active.querySelectorAll('.bar-fill[data-w]').forEach(b => {
+        const w = b.dataset.w;
+        b.style.width = '0%';
+        requestAnimationFrame(() => { setTimeout(() => b.style.width = w + '%', 100); });
+      });
+    }
+    document.querySelector('.sidebar')?.classList.remove('open');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  navItems.forEach(n => {
+    n.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (n.classList.contains('locked')) {
+        PV.toast('🔒 Complete previous stages first.');
+        return;
+      }
+      showScreen(n.dataset.screen);
+    });
+  });
+
+  // hash routing
+  function routeFromHash() {
+    const h = location.hash.replace('#', '');
+    if (h && labels[h]) {
+      const link = document.querySelector(`.nav-item[data-screen="${h}"]`);
+      if (link && !link.classList.contains('locked')) showScreen(h);
+    }
+  }
+  window.addEventListener('hashchange', routeFromHash);
+  routeFromHash();
+
+  // ─── Launch button → confirm modal ───
+  document.getElementById('launchBtn').addEventListener('click', () => {
+    const localId = 'PV-' + Math.random().toString(36).slice(2, 10).toUpperCase();
+    document.getElementById('sessionId').textContent = localId;
+    PV.openModal('launchModal');
+  });
+
+  // ─── Confirm → real Flask launch ───
+  document.getElementById('confirmLaunch').addEventListener('click', async () => {
+    const btn = document.getElementById('confirmLaunch');
+    btn.textContent = 'Launching…';
+    btn.disabled = true;
+
+    try {
+      // Fetch active campaign (most recent), then launch with it
+      let campaign_id = null;
+      try {
+        const campRes  = await fetch('http://localhost:5000/api/campaigns');
+        const campData = await campRes.json();
+        const camps    = campData.campaigns || [];
+        if (camps.length) campaign_id = camps[camps.length - 1].campaign_id;
+      } catch { /* no campaigns yet — free play */ }
+
+      const res = await fetch('http://localhost:5000/api/launch-game', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ cycle: '2026.Q2', campaign_id }),
+      });
+      const data = await res.json();
+      PV.closeModal('launchModal');
+
+      if (data.status === 'ok' || data.status === 'already_running') {
+        PV.toast('Launching PHISHVERSE… game opening now.');
+        // unlock subsequent stages once game is confirmed launched
+        document.querySelectorAll('.nav-item.locked').forEach(n => {
+          n.classList.remove('locked');
+          const badge = n.querySelector('.badge');
+          if (badge) { badge.textContent = '✓'; badge.classList.add('done'); }
+        });
+      } else {
+        PV.toast('Launch failed: ' + (data.message || 'unknown error'));
+      }
+    } catch {
+      PV.closeModal('launchModal');
+      PV.toast('Launch failed — start the backend first: python backend/app.py');
+    } finally {
+      btn.textContent = 'Launch Now';
+      btn.disabled = false;
+    }
+  });
+
+  // ─── Load real game results by Employee ID ───
+  function _populateReport(data) {
+    // Gauge — re-map score 0-100 to stroke-dashoffset 314→0
+    const score    = data.score || 0;
+    const offset   = 314 - (314 * score / 100);
+    const gaugePath = document.querySelector('#screen-report svg path:nth-child(3)');
+    if (gaugePath) gaugePath.setAttribute('stroke-dashoffset', offset);
+    const scoreEl = document.querySelector('.gauge-val .n');
+    if (scoreEl) scoreEl.textContent = score;
+
+    // Bias bars
+    const biasContainer = document.getElementById('biasContainer');
+    if (biasContainer && window.PV.renderBiasBar) {
+      PV.renderBiasBar(biasContainer, {
+        urgency:   data.urgency   || 0,
+        authority: data.authority || 0,
+        reward:    data.reward    || 0,
+        fear:      data.fear      || 0,
+      });
+    }
+
+    // AI debrief
+    const debriefEl = document.getElementById('aiDebriefText');
+    if (debriefEl) {
+      const name = data.employee_name || data.employee_id || 'Trainee';
+      debriefEl.innerHTML = `
+        <span style="color:var(--cyan);">&gt;</span> ${name}, your risk level is <strong style="color:var(--cyan);">${data.risk || 'UNKNOWN'}</strong> — weakest area: ${data.weakest_area || 'N/A'}.<br/>
+        <span style="color:var(--cyan);">&gt;</span> Events completed: ${data.events_completed || 0} / ${data.events_total || 0}.<br/>
+        <span style="color:var(--cyan);">&gt;</span> Recommendation: <span style="color:var(--gold);">${data.recommendation || '—'}</span><br/>
+        <span style="color:var(--cyan);">&gt;</span> Campaign: ${data.campaign_name || '—'}.
+      `;
+    }
+
+    // Update certificate name
+    const certNameEl = document.getElementById('certName');
+    if (certNameEl) certNameEl.textContent = data.employee_name || data.employee_id || '—';
+
+    // Update sidebar
+    const sn = data.employee_name || data.employee_id || 'Employee';
+    const sidebar_name = document.getElementById('sidebarName');
+    const sidebar_role = document.getElementById('sidebarRole');
+    const sidebar_av   = document.getElementById('sidebarAvatar');
+    if (sidebar_name) sidebar_name.textContent = sn;
+    if (sidebar_role) sidebar_role.textContent  = (data.department || 'Trainee');
+    if (sidebar_av)   sidebar_av.textContent    = sn.split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
+
+    // Update registration screen
+    const rn = document.getElementById('regName');
+    const rd = document.getElementById('regDept');
+    const ri = document.getElementById('regId');
+    if (rn) rn.textContent = data.employee_name || '—';
+    if (rd) rd.textContent = data.department    || '—';
+    if (ri) ri.textContent = data.employee_id   || '—';
+  }
+
+  document.getElementById('loadResultsBtn')?.addEventListener('click', async () => {
+    const empId = document.getElementById('resultIdInput')?.value?.trim();
+    const msg   = document.getElementById('resultLoadMsg');
+    if (!empId) { if (msg) msg.textContent = 'Enter an Employee ID first.'; return; }
+    if (msg) msg.textContent = 'LOADING…';
+    try {
+      const res  = await fetch(`http://localhost:5000/api/results/${encodeURIComponent(empId)}`);
+      const json = await res.json();
+      if (json.status === 'ok') {
+        _populateReport(json.data);
+        if (msg) msg.textContent = `✓ Results loaded for ${json.data.employee_name || empId}`;
+        PV.toast(`Results loaded for ${json.data.employee_name || empId}`);
+      } else {
+        if (msg) msg.textContent = `No results found for "${empId}" — complete the game first.`;
+      }
+    } catch {
+      if (msg) msg.textContent = 'Backend offline — start python backend/app.py';
+    }
+  });
+
+  // ─── Lecture continue → unlock next ───
+  window.continueLecture = function (btn) {
+    const card = btn.closest('.lecture-card');
+    const next = card.nextElementSibling;
+    card.style.opacity = '0.6';
+    btn.textContent = 'Completed ✓';
+    btn.classList.remove('primary');
+    btn.classList.add('ghost');
+    if (next && next.classList.contains('lecture-card')) {
+      next.classList.remove('locked');
+    }
+    // when last unlocked, enable continue button
+    const allLocked = document.querySelectorAll('.lecture-card.locked').length;
+    if (allLocked === 0) {
+      const cont = document.getElementById('toReportBtn');
+      cont.disabled = false;
+      cont.style.opacity = '1';
+    }
+  };
+
+  document.getElementById('toReportBtn').addEventListener('click', async () => {
+    const r = await PV.mockPost('/api/cycle/report', { cycle: '2026.Q2' });
+    PV.toast('Report generated · score ' + r.score);
+    showScreen('report');
+  });
+
+  // ─── MCQ logic ───
+  const mcqOpts = document.querySelectorAll('.mcq-opt');
+  const nextBtn = document.getElementById('nextQ');
+  let answered = false;
+  mcqOpts.forEach(o => {
+    o.addEventListener('click', () => {
+      if (answered) return;
+      mcqOpts.forEach(x => x.classList.remove('selected'));
+      o.classList.add('selected');
+    });
+  });
+  nextBtn.addEventListener('click', () => {
+    if (answered) {
+      // simulate progression to certificate
+      PV.mockPost('/api/cycle/complete', { cycle: '2026.Q2', score: 87 }).then(r => {
+        PV.toast('✓ Certificate issued · ' + r.certificate);
+        showScreen('certificate');
+      });
+      return;
+    }
+    const sel = document.querySelector('.mcq-opt.selected');
+    if (!sel) { PV.toast('Select an answer first'); return; }
+    answered = true;
+    mcqOpts.forEach(o => {
+      if (o.dataset.correct === 'true') o.classList.add('correct');
+      else if (o === sel) o.classList.add('wrong');
+    });
+    nextBtn.innerHTML = 'Finish &amp; View Certificate <svg class="btn-icon arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
+  });
+
+  // mock timer
+  let secs = 42;
+  const timerEl = document.getElementById('qTimer');
+  setInterval(() => {
+    secs = (secs + 59) % 60 || 59;
+    timerEl.textContent = '00:' + String(secs).padStart(2, '0');
+  }, 1000);
+
+  // re-run bar anims when initial exam shows (already visible)
+  document.querySelectorAll('.bar-fill[data-w]').forEach(b => {
+    setTimeout(() => { b.style.width = b.dataset.w + '%'; }, 300);
+  });
+</script>
+</body>
+</html>

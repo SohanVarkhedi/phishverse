@@ -1,0 +1,19 @@
+{
+  "employee": "100",
+  "risk": "HIGH",
+  "confidence": 0.95,
+  "weakness": "urgency",
+  "recommendation": "Immediate training required: Email Phishing Awareness.",
+  "generated_topics": [
+    "urgency",
+    "urgency",
+    "urgency",
+    "urgency",
+    "authority",
+    "authority",
+    "reward",
+    "reward",
+    "fear",
+    "fear"
+  ]
+}

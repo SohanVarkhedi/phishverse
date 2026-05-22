@@ -1,0 +1,53 @@
+{
+  "employee": {
+    "employee_name": "Sohan",
+    "employee_id": "100",
+    "department": "IT",
+    "role": ""
+  },
+  "campaign": "finance_campaign",
+  "campaign_name": "Finance Protection",
+  "date": "2026-05-22",
+  "score": 90,
+  "pass_score": 85,
+  "passed": true,
+  "risk": "LOW",
+  "biases": {
+    "urgency": 10,
+    "authority": 0,
+    "reward": 0,
+    "fear": 0
+  },
+  "weakness": {
+    "primary": "Urgency Manipulation",
+    "secondary": "Authority Phishing"
+  },
+  "training_progress": {
+    "events_total": 2,
+    "events_completed": 2,
+    "progress_pct": 100,
+    "completed_events": [
+      "ceo_fraud",
+      "email_phishing"
+    ]
+  },
+  "maturity": {
+    "level": "Cyber Guardian",
+    "description": "You are a cybersecurity champion.",
+    "score": 90
+  },
+  "lectures": {
+    "assigned": 0,
+    "completed": 0,
+    "pending": 0,
+    "progress_pct": 0,
+    "items": []
+  },
+  "recommendation": {
+    "next_lecture": "Phishing Under Pressure",
+    "suggested_topic": "Urgency Manipulation",
+    "exam_ready": true
+  },
+  "exam_status": "UNLOCKED",
+  "timestamp": "2026-05-22T15:55:31.745520+00:00"
+}

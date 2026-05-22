@@ -42,12 +42,20 @@ class CyberResilienceReport:
         self._timer = 0
         self._done  = False
 
-    def handle_key(self, key: int) -> bool:
-        """Returns True when user dismisses the report (Q / Esc)."""
-        if key in (pygame.K_q, pygame.K_ESCAPE, pygame.K_RETURN):
+    def handle_key(self, key: int) -> str | None:
+        """
+        Returns:
+            'DASHBOARD' — ENTER pressed, proceed to analytics dashboard
+            'QUIT'      — Q / ESC pressed, exit immediately
+            None        — no action
+        """
+        if key in (pygame.K_RETURN, pygame.K_e):
             self._done = True
-            return True
-        return False
+            return "DASHBOARD"
+        if key in (pygame.K_q, pygame.K_ESCAPE):
+            self._done = True
+            return "QUIT"
+        return None
 
     @property
     def done(self) -> bool:
@@ -65,16 +73,32 @@ class CyberResilienceReport:
             pygame.draw.line(screen, (shade, shade, shade + 20), (0, y), (self.sw, y))
 
         # ── Header panel ────────────────────────────────────────────────────
-        header_h = 70
+        header_h = 98
         hdr = pygame.Surface((self.sw, header_h), pygame.SRCALPHA)
         hdr.fill((20, 20, 50, 230))
         screen.blit(hdr, (0, 0))
         pygame.draw.line(screen, UI_BORDER, (0, header_h), (self.sw, header_h), 2)
 
         title = self._big.render("CYBER RESILIENCE REPORT", True, UI_GOLD)
-        screen.blit(title, (self.sw // 2 - title.get_width() // 2, 18))
+        screen.blit(title, (self.sw // 2 - title.get_width() // 2, 10))
 
         d = self._data
+
+        # ── Employee identity strip ──────────────────────────────────────────
+        emp_name = d.get("employee_name", "")
+        emp_id   = d.get("employee_id",   "")
+        emp_dept = d.get("department",    "")
+        emp_camp = d.get("campaign_name", "")
+
+        id_parts = []
+        if emp_name: id_parts.append(f"Name: {emp_name}")
+        if emp_id:   id_parts.append(f"ID: {emp_id}")
+        if emp_dept: id_parts.append(f"Dept: {emp_dept}")
+        if emp_camp: id_parts.append(f"Campaign: {emp_camp}")
+        id_line = self._small.render("  ·  ".join(id_parts), True, (160, 175, 220))
+        screen.blit(id_line, (self.sw // 2 - id_line.get_width() // 2, 46))
+
+        pygame.draw.line(screen, (*UI_BORDER, 60), (40, 70), (self.sw - 40, 70), 1)
         risk_level = d.get("risk_level", "MEDIUM")
         risk_color = RISK_COLORS.get(risk_level, WHITE)
 
@@ -178,7 +202,7 @@ class CyberResilienceReport:
         tag_label = self._small.render("ATTACK VECTORS ENCOUNTERED:", True, LIGHT_GREY)
         screen.blit(tag_label, (30, 402))
 
-        tags = ["Urgency Manipulation", "QR Phishing", "USB Drop", "Authority Phishing", "Vishing", "BEC Fraud"]
+        tags = d.get("attack_vectors") or []
         tag_x = 30
         for tag in tags:
             tg = self._small.render(f"  {tag}  ", True, BLACK)
@@ -196,14 +220,16 @@ class CyberResilienceReport:
         cert.fill((20, 40, 20, 200))
         screen.blit(cert, (30, cert_y))
         pygame.draw.rect(screen, UI_HIGHLIGHT, (30, cert_y, self.sw - 60, 80), 2, border_radius=8)
+        emp_display = d.get("employee_name") or d.get("employee_id") or "This employee"
         ct1 = self._font.render("🏅  PHISHVERSE CYBER AWARENESS CERTIFICATE", True, UI_GOLD)
-        ct2 = self._small.render(f"This player demonstrated {risk_level} risk resilience.  Score: {score}/100", True, LIGHT_GREY)
+        ct2 = self._small.render(f"{emp_display} demonstrated {risk_level} risk resilience.  Score: {score}/100", True, LIGHT_GREY)
         screen.blit(ct1, (self.sw // 2 - ct1.get_width() // 2, cert_y + 10))
         screen.blit(ct2, (self.sw // 2 - ct2.get_width() // 2, cert_y + 42))
 
         # ── Dismiss hint ─────────────────────────────────────────────────────
         if (t // 30) % 2 == 0:
-            hint = self._small.render("Press ENTER or ESC to quit", True, MID_GREY)
+            hint = self._small.render(
+                "ENTER — view Analytics Dashboard   ·   ESC / Q — quit", True, MID_GREY)
             screen.blit(hint, (self.sw // 2 - hint.get_width() // 2, self.sh - 20))
 
     # ── Helpers ──────────────────────────────────────────────────────────────

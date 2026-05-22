@@ -1,0 +1,19 @@
+{
+  "employee": "2408",
+  "risk": "LOW",
+  "confidence": 0.83,
+  "weakness": "none",
+  "recommendation": "Comprehensive cybersecurity awareness training recommended.",
+  "generated_topics": [
+    "urgency",
+    "urgency",
+    "urgency",
+    "urgency",
+    "authority",
+    "authority",
+    "reward",
+    "reward",
+    "fear",
+    "fear"
+  ]
+}

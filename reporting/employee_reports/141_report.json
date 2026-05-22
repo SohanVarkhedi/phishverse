@@ -1,0 +1,53 @@
+{
+  "employee": {
+    "employee_name": "sujal",
+    "employee_id": "141",
+    "department": "HR",
+    "role": ""
+  },
+  "campaign": "finance_campaign",
+  "campaign_name": "Finance Protection",
+  "date": "2026-05-22",
+  "score": 70,
+  "pass_score": 85,
+  "passed": false,
+  "risk": "MEDIUM",
+  "biases": {
+    "urgency": 20,
+    "authority": 20,
+    "reward": 0,
+    "fear": 5
+  },
+  "weakness": {
+    "primary": "Urgency Manipulation",
+    "secondary": "Authority Phishing"
+  },
+  "training_progress": {
+    "events_total": 2,
+    "events_completed": 2,
+    "progress_pct": 100,
+    "completed_events": [
+      "ceo_fraud",
+      "email_phishing"
+    ]
+  },
+  "maturity": {
+    "level": "Secure",
+    "description": "You demonstrate solid security instincts.",
+    "score": 70
+  },
+  "lectures": {
+    "assigned": 0,
+    "completed": 0,
+    "pending": 0,
+    "progress_pct": 0,
+    "items": []
+  },
+  "recommendation": {
+    "next_lecture": "Phishing Under Pressure",
+    "suggested_topic": "Urgency Manipulation",
+    "exam_ready": true
+  },
+  "exam_status": "UNLOCKED",
+  "timestamp": "2026-05-22T13:14:40.620396+00:00"
+}

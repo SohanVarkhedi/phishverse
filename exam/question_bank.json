@@ -1,0 +1,203 @@
+{
+  "questions": [
+    { "id": "U001", "category": "urgency",
+      "question": "An email says 'Your account will be SUSPENDED in 2 hours unless you verify now!' What is the safest response?",
+      "options": ["Click the link to prevent suspension", "Call official support to verify your account status", "Reply asking for more time to respond", "Forward to your manager to handle"],
+      "answer": "B" },
+
+    { "id": "U002", "category": "urgency",
+      "question": "Why do attackers create extreme urgency in phishing messages?",
+      "options": ["To help you respond faster to real threats", "To bypass your critical thinking and verification habits", "To comply with data protection regulations", "To test your email response time"],
+      "answer": "B" },
+
+    { "id": "U003", "category": "urgency",
+      "question": "Your 'manager' texts: 'EMERGENCY! Wire £5,000 NOW — no time to call!' What do you do?",
+      "options": ["Send the money — it's from your manager", "Wire half first as a cautious test", "Call your manager on their known verified number", "Ask HR to process it immediately"],
+      "answer": "C" },
+
+    { "id": "U004", "category": "urgency",
+      "question": "A pop-up reads 'VIRUS DETECTED — Call this number IMMEDIATELY!' You should:",
+      "options": ["Call the number to protect your device", "Grant them remote access as they suggest", "Close it and contact your IT security team directly", "Download their recommended cleaning tool"],
+      "answer": "C" },
+
+    { "id": "U005", "category": "urgency",
+      "question": "Which message is a clear urgency manipulation red flag?",
+      "options": ["A scheduled IT maintenance notice", "A meeting invite for next week", "A message demanding action in 15 minutes or your account is permanently deleted", "A product newsletter with a seasonal offer"],
+      "answer": "C" },
+
+    { "id": "U006", "category": "urgency",
+      "question": "What is the best first step when any message creates panic or extreme urgency?",
+      "options": ["Act quickly to prevent the stated consequence", "Slow down and independently verify the request", "Forward it to your whole team immediately", "Delete the message to avoid infection"],
+      "answer": "B" },
+
+    { "id": "U007", "category": "urgency",
+      "question": "An IT email says 'Respond within 10 minutes or your access will be permanently revoked.' This is:",
+      "options": ["Standard IT security procedure", "A legitimate automated security alert", "Likely a phishing attempt using artificial urgency", "A valid warning from your security team"],
+      "answer": "C" },
+
+    { "id": "U008", "category": "urgency",
+      "question": "A caller says your bank account is being drained and needs your PIN to stop it. You:",
+      "options": ["Hang up and call your bank's official number", "Provide just the last 4 digits as a compromise", "Ask them to hold while you check your balance online", "Transfer funds to a 'safe account' they provide"],
+      "answer": "A" },
+
+    { "id": "U009", "category": "urgency",
+      "question": "Urgency-based social engineering succeeds because it:",
+      "options": ["Provides verifiable evidence of a real threat", "Bypasses rational thought by triggering fear and panic", "Always comes with official supporting documentation", "Is easy to trace back to the real sender"],
+      "answer": "B" },
+
+    { "id": "U010", "category": "urgency",
+      "question": "The single most effective defence against urgency manipulation is:",
+      "options": ["Having a fast email response system", "Pausing and verifying through an independent channel", "Ignoring all messages that have deadlines", "Only reading emails during business hours"],
+      "answer": "B" },
+
+    { "id": "A001", "category": "authority",
+      "question": "An email from 'CEO@company-secure.co' asks you to bypass approvals for an urgent payment. You:",
+      "options": ["Comply — it came from the CEO", "Verify by calling the CEO's office on their known direct number", "Reply asking for written approval by return email", "Process half the amount as a compromise"],
+      "answer": "B" },
+
+    { "id": "A002", "category": "authority",
+      "question": "What is a Business Email Compromise (BEC) attack?",
+      "options": ["When company email servers are hacked by ransomware", "A spam campaign flooding a business inbox", "Attackers impersonating executives to authorise fraudulent transfers", "When employees accidentally email confidential data externally"],
+      "answer": "C" },
+
+    { "id": "A003", "category": "authority",
+      "question": "A caller claims to be from Microsoft and needs your password to fix a problem. You:",
+      "options": ["Hang up — Microsoft never calls unsolicited asking for passwords", "Provide a temporary password instead", "Give only your username for identification", "Ask them to send an official email request"],
+      "answer": "A" },
+
+    { "id": "A004", "category": "authority",
+      "question": "An 'HR Director' emails: 'Update your bank details for payroll via this link.' This is likely:",
+      "options": ["Standard HR procedure for payroll updates", "A payroll diversion fraud attempt", "An automated payroll system update", "A routine annual data verification exercise"],
+      "answer": "B" },
+
+    { "id": "A005", "category": "authority",
+      "question": "Which is the clearest sign of an authority impersonation attack?",
+      "options": ["Email from your confirmed manager about a known project", "A letter on official company letterhead", "A calendar invite from a known colleague", "Email from an unfamiliar domain asking you to act urgently on behalf of an executive"],
+      "answer": "D" },
+
+    { "id": "A006", "category": "authority",
+      "question": "'IT Security' emails requesting you to reset your password urgently via a link. You should:",
+      "options": ["Click the reset link in the email immediately", "Navigate directly to the official IT portal to reset your password", "Reply with your current password for identity verification", "Forward the warning email to all staff"],
+      "answer": "B" },
+
+    { "id": "A007", "category": "authority",
+      "question": "Why are authority-based phishing attacks particularly effective?",
+      "options": ["They always contain perfect spelling and grammar", "They only target senior management", "Most people are conditioned to comply without questioning authority", "They are always sent from verified email addresses"],
+      "answer": "C" },
+
+    { "id": "A008", "category": "authority",
+      "question": "A 'senior partner' calls asking you to share client data immediately for an audit. You:",
+      "options": ["Verify their identity through official company channels before sharing anything", "Share the data — internal audits are legitimate", "Email the data to their stated address and CC your manager", "Ask a junior colleague to handle the call"],
+      "answer": "A" },
+
+    { "id": "A009", "category": "authority",
+      "question": "How do you best verify a suspicious email claiming to be from an executive?",
+      "options": ["Check that it contains the company logo", "Look for a professional signature at the bottom", "Count the number of recipients in the CC field", "Check the actual sender domain and verify via a separate trusted channel"],
+      "answer": "D" },
+
+    { "id": "A010", "category": "authority",
+      "question": "An 'executive' email asks you to keep the request secret from the security team. This is:",
+      "options": ["Acceptable for sensitive business matters", "Only suspicious if the amount exceeds your spending policy", "Standard practice in merger and acquisition processes", "A significant red flag — legitimate business requests rarely bypass security review"],
+      "answer": "D" },
+
+    { "id": "R001", "category": "reward",
+      "question": "An email says 'YOU HAVE WON a £500 gift card! Click here to claim!' You:",
+      "options": ["Delete it — you did not enter any prize draw", "Click to see what you have won", "Forward it to a friend who might want it", "Reply with your address to receive the gift card"],
+      "answer": "A" },
+
+    { "id": "R002", "category": "reward",
+      "question": "Why do attackers use reward-based lures in phishing emails?",
+      "options": ["To provide genuine incentives to cooperation", "To test employees' reactions to good news", "To exploit natural human optimism and lower the victim's guard", "To comply with marketing data collection regulations"],
+      "answer": "C" },
+
+    { "id": "R003", "category": "reward",
+      "question": "An internal email announces a cash bonus — click this link to confirm your details. You:",
+      "options": ["Click immediately to secure your bonus", "Ignore it — you were not expecting a bonus", "Verify by checking the official HR or payroll portal directly", "Reply asking for the bonus amount before proceeding"],
+      "answer": "C" },
+
+    { "id": "R004", "category": "reward",
+      "question": "Which is the clearest red flag in a reward-based phishing email?",
+      "options": ["A professional-looking company logo", "A formally written email", "Correct spelling and grammar throughout", "An offer requiring you to enter personal details via a link to claim a prize"],
+      "answer": "D" },
+
+    { "id": "R005", "category": "reward",
+      "question": "A supplier offers an exclusive discount for 24 hours — click the link to activate. You:",
+      "options": ["Ignore all discount offers as they are always fake", "Click immediately so you do not miss out", "Verify the offer directly with the supplier by calling their known number", "Forward to your entire purchasing department"],
+      "answer": "C" },
+
+    { "id": "R006", "category": "reward",
+      "question": "You land on a page saying you are the '1,000th visitor' and have won a prize. This is:",
+      "options": ["A legitimate website milestone celebration", "A random lucky event worth exploring", "Likely a fake prize page designed to steal your personal data", "A standard marketing survey campaign"],
+      "answer": "C" },
+
+    { "id": "R007", "category": "reward",
+      "question": "Which behaviour best protects you from reward-based social engineering?",
+      "options": ["Only accepting rewards from organisations you already know", "Clicking links to check whether rewards are real", "Reporting all prize notifications to your IT team", "Being sceptical of any unsolicited offer requiring you to take action or provide data"],
+      "answer": "D" },
+
+    { "id": "R008", "category": "reward",
+      "question": "An email says your loyalty points will expire unless you click to redeem them now. You:",
+      "options": ["Click the link to redeem your points before they expire", "Contact the company directly via their official website or app", "Ask a colleague to check the link safety first", "Ignore all loyalty programme communications"],
+      "answer": "B" },
+
+    { "id": "R009", "category": "reward",
+      "question": "Reward lures in cyberattacks primarily exploit:",
+      "options": ["Greed in high-earners only", "Employees who frequently shop online", "Natural human optimism and the desire for gain regardless of context", "Financial vulnerability in low-income workers"],
+      "answer": "C" },
+
+    { "id": "R010", "category": "reward",
+      "question": "Before clicking any link in a reward or offer email, the most important check is:",
+      "options": ["Whether the email has a professional signature", "Whether the email appears to be from a known brand", "Whether the reward amount sounds reasonable", "Whether the link URL matches the sender's stated domain"],
+      "answer": "D" },
+
+    { "id": "F001", "category": "fear",
+      "question": "An email says your data will be published online unless you pay £200 in Bitcoin within 48 hours. You:",
+      "options": ["Pay immediately to prevent public exposure", "Contact your IT security team and report the extortion attempt", "Pay a reduced amount to negotiate", "Ignore it completely — they definitely do not have your data"],
+      "answer": "B" },
+
+    { "id": "F002", "category": "fear",
+      "question": "Why are fear-based threats effective in cyberattacks?",
+      "options": ["They always include real evidence of compromise", "They are sent from verified government addresses", "Fear impairs rational thinking and causes people to act without verifying", "Most people have genuinely compromising data to protect"],
+      "answer": "C" },
+
+    { "id": "F003", "category": "fear",
+      "question": "Your screen displays: 'ALL FILES ENCRYPTED — PAY NOW!' You:",
+      "options": ["Disconnect from the network immediately and report to IT security", "Pay the ransom quickly to restore your files", "Restart your computer to remove the encryption", "Try to decrypt the files yourself using online tools"],
+      "answer": "A" },
+
+    { "id": "F004", "category": "fear",
+      "question": "A caller claims to be from HMRC saying you owe unpaid taxes — pay now or be arrested. You:",
+      "options": ["Pay immediately to avoid arrest", "Ask them to email the official notice", "Provide your bank account number to confirm your identity", "Hang up — HMRC does not make unsolicited calls demanding immediate payment"],
+      "answer": "D" },
+
+    { "id": "F005", "category": "fear",
+      "question": "Regarding ransomware payments, which statement is CORRECT?",
+      "options": ["Paying always guarantees full file recovery", "Paying does not guarantee recovery and directly funds further criminal attacks", "Ransomware only affects government and hospital systems", "Restarting your PC removes most ransomware infections"],
+      "answer": "B" },
+
+    { "id": "F006", "category": "fear",
+      "question": "An email claims you have violated copyright law and must pay a fine via a link or face prosecution. You:",
+      "options": ["Pay the fine to avoid legal trouble", "Click to read the full legal notice carefully", "Verify with your legal team or check official government channels", "Forward to your manager to handle urgently"],
+      "answer": "C" },
+
+    { "id": "F007", "category": "fear",
+      "question": "Fear-based social engineering is most dangerous because it:",
+      "options": ["Is exclusively used in targeted spear phishing attacks", "Always delivers technical malware directly", "Triggers panic that overrides security training and critical thinking", "Is undetectable by all modern security tools"],
+      "answer": "C" },
+
+    { "id": "F008", "category": "fear",
+      "question": "A browser pop-up warns your computer is severely infected — call a support number immediately. You:",
+      "options": ["Close the browser and run your official company antivirus software", "Call the support number as instructed to get help", "Click on the pop-up to read the full infection report", "Download the cleaning tool they advertise in the pop-up"],
+      "answer": "A" },
+
+    { "id": "F009", "category": "fear",
+      "question": "You receive an email threatening to send embarrassing photos to your contacts unless you pay. You:",
+      "options": ["Report it to the police and your IT security team — do not pay", "Pay a small amount to test if they go away", "Reply asking for proof that they actually have the material", "Warn all your contacts preemptively about the threat"],
+      "answer": "A" },
+
+    { "id": "F010", "category": "fear",
+      "question": "The best technical defence against ransomware is:",
+      "options": ["Installing the cheapest antivirus available", "Keeping all software unpatched for system stability", "Regular tested offline backups combined with up-to-date endpoint protection", "Only storing important files on cloud services"],
+      "answer": "C" }
+  ]
+}

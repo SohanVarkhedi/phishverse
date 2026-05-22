@@ -1,0 +1,31 @@
+{
+  "employee_name": "RAHUL ARAG",
+  "employee_id": "420",
+  "department": "Finance",
+  "role": "",
+  "campaign": "rahul_campaign",
+  "campaign_name": "rahul campaign",
+  "score": 80,
+  "pass_score": 85,
+  "passed": false,
+  "urgency": 0,
+  "authority": 20,
+  "reward": 0,
+  "fear": 15,
+  "risk": "LOW",
+  "weakest_area": "Authority Phishing",
+  "recommendation": "Excellent awareness! Keep up regular cyber training.",
+  "mistakes": 2,
+  "successful_reports": 4,
+  "completed_events": [
+    "email_phishing",
+    "voice_phishing",
+    "ceo_fraud",
+    "qr_phishing",
+    "usb_drop",
+    "hr_message"
+  ],
+  "events_total": 6,
+  "events_completed": 6,
+  "timestamp": "2026-05-22T19:39:34.545125+00:00"
+}

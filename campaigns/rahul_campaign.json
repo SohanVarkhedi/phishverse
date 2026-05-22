@@ -1,0 +1,17 @@
+{
+  "campaign_id": "rahul_campaign",
+  "name": "rahul campaign",
+  "department": "General",
+  "description": "General security training \u2014 rahul campaign",
+  "employees": [],
+  "enabled_events": [
+    "email_phishing",
+    "qr_phishing",
+    "usb_drop",
+    "hr_message",
+    "voice_phishing",
+    "ceo_fraud"
+  ],
+  "pass_score": 85,
+  "duration_days": 1
+}

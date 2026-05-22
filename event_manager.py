@@ -89,6 +89,8 @@ class EventManager:
 
     def _after_outcome(self):
         self._active = None
+        if self._on_game_end and len(self._seen) >= self.db.total:
+            self._on_game_end()
 
     def _on_final_done(self):
         self._active = None

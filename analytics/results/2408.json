@@ -1,0 +1,28 @@
+{
+  "employee_name": "SUJAL",
+  "employee_id": "2408",
+  "department": "General",
+  "role": "CEO",
+  "campaign": "employee_campaign",
+  "campaign_name": "General Employee Training",
+  "score": 100,
+  "pass_score": 70,
+  "passed": true,
+  "urgency": 0,
+  "authority": 0,
+  "reward": 0,
+  "fear": 0,
+  "risk": "LOW",
+  "weakest_area": "Urgency Attacks",
+  "recommendation": "Excellent awareness! Keep up regular cyber training.",
+  "mistakes": 0,
+  "successful_reports": 3,
+  "completed_events": [
+    "voice_phishing",
+    "hr_message",
+    "ceo_fraud"
+  ],
+  "events_total": 6,
+  "events_completed": 3,
+  "timestamp": "2026-05-22T16:20:29.162346+00:00"
+}

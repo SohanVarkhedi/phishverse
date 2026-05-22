@@ -1,0 +1,14 @@
+{
+  "campaign_id": "hr_campaign",
+  "name": "HR Security Awareness",
+  "department": "HR",
+  "description": "Targeted training for HR staff. Covers authority-based phishing, fake HR portal links, and vishing calls impersonating IT Support — the three attack vectors most commonly used against HR departments.",
+  "employees": ["emp01", "emp02", "emp03"],
+  "enabled_events": [
+    "email_phishing",
+    "hr_message",
+    "voice_phishing"
+  ],
+  "pass_score": 80,
+  "duration_days": 7
+}

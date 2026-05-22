@@ -1,0 +1,17 @@
+{
+  "campaign_id": "q2_reception_calm_refuse",
+  "name": "Q2 Reception \u00b7 Calm Refuse",
+  "department": "General",
+  "description": "General security training \u2014 Q2 Reception \u00b7 Calm Refuse",
+  "employees": [],
+  "enabled_events": [
+    "email_phishing",
+    "qr_phishing",
+    "usb_drop",
+    "hr_message",
+    "voice_phishing",
+    "ceo_fraud"
+  ],
+  "pass_score": 85,
+  "duration_days": 1
+}

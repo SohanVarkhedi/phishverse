@@ -1,0 +1,27 @@
+{
+  "employee_name": "VIRAT KOHLI",
+  "employee_id": "18",
+  "department": "HR",
+  "role": "",
+  "campaign": "q2_reception_calm_refuse",
+  "campaign_name": "Q2 Reception · Calm Refuse",
+  "score": 85,
+  "pass_score": 85,
+  "passed": true,
+  "urgency": 0,
+  "authority": 15,
+  "reward": 0,
+  "fear": 10,
+  "risk": "LOW",
+  "weakest_area": "Authority Phishing",
+  "recommendation": "Excellent awareness! Keep up regular cyber training.",
+  "mistakes": 1,
+  "successful_reports": 1,
+  "completed_events": [
+    "hr_message",
+    "voice_phishing"
+  ],
+  "events_total": 2,
+  "events_completed": 2,
+  "timestamp": "2026-05-22T19:15:34.103855+00:00"
+}

@@ -1,0 +1,1211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PHISHVERSE — Manager Portal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="styles.css" />
+
+<style>
+  /* admin-specific */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px)  { .kpi-grid { grid-template-columns: 1fr; } }
+
+  .kpi {
+    padding: 22px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(180deg, rgba(11,16,32,0.7), rgba(3,5,12,0.5));
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px; height: 100%;
+    background: var(--cyan);
+    box-shadow: 0 0 12px var(--cyan);
+  }
+  .kpi.gold::before { background: var(--gold); box-shadow: 0 0 12px var(--gold); }
+  .kpi.green::before { background: var(--green); box-shadow: 0 0 12px var(--green); }
+  .kpi.red::before { background: var(--red); box-shadow: 0 0 12px var(--red); }
+  .kpi-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .kpi-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+  .kpi-val { font-family: var(--font-display); font-size: 38px; font-weight: 700; letter-spacing: -0.02em; margin-top: 10px; line-height: 1; }
+  .kpi-trend { font-family: var(--font-mono); font-size: 11px; color: var(--green); margin-top: 8px; display: inline-flex; align-items: center; gap: 4px; }
+  .kpi-trend.down { color: var(--red); }
+  .kpi-spark { position: absolute; right: -4px; bottom: 0; opacity: 0.6; }
+
+  .panel-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 1100px) { .panel-grid { grid-template-columns: 1fr; } }
+
+  /* Risk heatmap blocks */
+  .heatmap {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .heat-cell {
+    aspect-ratio: 1.4 / 1;
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid var(--line);
+    transition: transform 0.25s, border-color 0.25s;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .heat-cell:hover { transform: translateY(-3px); }
+  .heat-cell .dep { font-size: 13px; font-weight: 500; }
+  .heat-cell .pct { font-family: var(--font-display); font-size: 28px; font-weight: 700; }
+  .heat-cell .micro { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; }
+  .heat-cell.t5 { background: linear-gradient(180deg, rgba(255,61,87,0.22), rgba(255,61,87,0.06)); border-color: rgba(255,61,87,0.5); color: #FFE5EA; }
+  .heat-cell.t5 .pct { color: var(--red); }
+  .heat-cell.t4 { background: linear-gradient(180deg, rgba(245,197,24,0.22), rgba(245,197,24,0.04)); border-color: rgba(245,197,24,0.5); color: #FFF1B8; }
+  .heat-cell.t4 .pct { color: var(--gold); }
+  .heat-cell.t3 { background: linear-gradient(180deg, rgba(168,85,247,0.18), rgba(168,85,247,0.04)); border-color: rgba(168,85,247,0.4); color: #ECDDFE; }
+  .heat-cell.t3 .pct { color: var(--purple); }
+  .heat-cell.t2 { background: linear-gradient(180deg, rgba(24,232,255,0.16), rgba(24,232,255,0.04)); border-color: rgba(24,232,255,0.4); color: #DDF7FF; }
+  .heat-cell.t2 .pct { color: var(--cyan); }
+  .heat-cell.t1 { background: linear-gradient(180deg, rgba(0,232,122,0.18), rgba(0,232,122,0.04)); border-color: rgba(0,232,122,0.4); color: #D7FBE7; }
+  .heat-cell.t1 .pct { color: var(--green); }
+  @media (max-width: 900px) { .heatmap { grid-template-columns: repeat(2, 1fr); } }
+
+  /* Tables */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .data-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 400;
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .data-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+  .data-table tr:hover td { background: rgba(239,243,255,0.02); }
+  .data-table .uname { display: flex; align-items: center; gap: 12px; }
+  .data-table .uname .av {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: var(--font-display);
+    font-size: 12px;
+    color: #001218;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .data-table .uname .name-block .nm { font-weight: 500; }
+  .data-table .uname .name-block .em { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+  .mini-bar {
+    height: 4px;
+    width: 80px;
+    background: rgba(239,243,255,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  .mini-bar > i { display: block; height: 100%; border-radius: 999px; }
+
+  /* Threat feed */
+  .feed { display: flex; flex-direction: column; gap: 12px; }
+  .feed-item {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(239,243,255,0.02);
+    border: 1px solid var(--line);
+  }
+  .feed-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .feed-item .ttl { font-size: 13px; font-weight: 500; }
+  .feed-item .when { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+  /* Sparkline */
+  .chart {
+    height: 220px;
+    position: relative;
+  }
+  .chart svg { width: 100%; height: 100%; overflow: visible; }
+  .chart .grid line { stroke: rgba(239,243,255,0.06); }
+  .chart .axis-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; fill: var(--muted); text-transform: uppercase; }
+
+  .screen { display: none; }
+  .screen.show { display: block; animation: rise 0.4s cubic-bezier(.2,.7,.2,1); }
+
+  .grid-two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 900px) { .grid-two, .grid-three { grid-template-columns: 1fr; } }
+
+  /* New campaign builder */
+  .builder-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
+  @media (max-width: 1100px) { .builder-grid { grid-template-columns: 1fr; } }
+
+  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(239,243,255,0.02);
+    font-size: 12px;
+    color: var(--text);
+    font-family: inherit;
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .chip:hover { background: rgba(239,243,255,0.06); }
+  .chip.on {
+    background: rgba(24,232,255,0.12);
+    border-color: rgba(24,232,255,0.5);
+    color: var(--cyan);
+    box-shadow: 0 0 12px rgba(24,232,255,0.2);
+  }
+
+  .difficulty-row { display: flex; gap: 8px; }
+  .difficulty-row .chip { flex: 1; text-align: center; }
+
+  .ai-preview {
+    padding: 24px;
+    border-radius: var(--radius-md);
+    background:
+      radial-gradient(circle at 100% 0%, rgba(168,85,247,0.12), transparent 60%),
+      linear-gradient(180deg, rgba(11,16,32,0.8), rgba(3,5,12,0.6));
+    border: 1px solid rgba(168,85,247,0.25);
+    position: relative;
+    overflow: hidden;
+    min-height: 100%;
+  }
+  .ai-preview h4 { font-family: var(--font-body); font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .ai-preview .mono-body {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.9;
+    color: #C7D0E8;
+    letter-spacing: 0.02em;
+    margin: 14px 0;
+  }
+  .ai-preview .typing::after {
+    content: '_';
+    color: var(--cyan);
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* MCQ results bars */
+  .question-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px 80px;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .question-row:last-child { border-bottom: none; }
+  .question-row .q-num { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .question-row .q-bar-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .question-row .q-stats { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); }
+
+  /* Settings */
+  .setting-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row .title { font-size: 14px; font-weight: 500; }
+  .setting-row .desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .toggle {
+    width: 42px; height: 24px;
+    background: rgba(239,243,255,0.08);
+    border-radius: 999px;
+    position: relative;
+    cursor: none;
+    border: 1px solid var(--line);
+    transition: background 0.2s;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    background: var(--text);
+    border-radius: 50%;
+    transition: left 0.2s, background 0.2s;
+  }
+  .toggle.on { background: rgba(24,232,255,0.3); border-color: rgba(24,232,255,0.4); }
+  .toggle.on::after { left: 20px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+  .hamb {
+    display: none;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    place-items: center;
+  }
+  @media (max-width: 760px) { .hamb { display: grid; } }
+</style>
+</head>
+<body>
+
+<div class="portal-shell">
+
+  <!-- ───── Sidebar ───── -->
+  <aside class="sidebar">
+    <a href="index.html" class="brand">
+      <span class="brand-mark"></span>
+      <span>PHISHVERSE</span>
+    </a>
+
+    <div class="sidebar-section">Manager Console</div>
+    <a href="#overview" class="sidebar-link nav-item active" data-screen="overview">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      Overview
+    </a>
+    <a href="#employees" class="sidebar-link nav-item" data-screen="employees">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Employees
+      <span class="badge">214</span>
+    </a>
+    <a href="#campaigns" class="sidebar-link nav-item" data-screen="campaigns">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+      Campaigns
+      <span class="badge active">3</span>
+    </a>
+    <a href="#heatmap" class="sidebar-link nav-item" data-screen="heatmap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Risk Heatmap
+    </a>
+    <a href="#reports" class="sidebar-link nav-item" data-screen="reports">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h2"/></svg>
+      AI Reports
+    </a>
+    <a href="#mcq" class="sidebar-link nav-item" data-screen="mcq">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 11l3 3 8-8"/><path d="M21 12v6a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h11"/></svg>
+      MCQ Results
+    </a>
+
+    <div class="sidebar-section">Tools</div>
+    <a href="#new" class="sidebar-link nav-item" data-screen="new">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+      New Campaign
+      <span class="badge" style="background:rgba(245,197,24,0.18); color:var(--gold);">+</span>
+    </a>
+    <a href="#settings" class="sidebar-link nav-item" data-screen="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h0a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h0a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v0a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="avatar" style="background: linear-gradient(135deg, var(--gold), var(--red));">AU</div>
+      <div>
+        <div class="name">Admin User</div>
+        <div class="role">CISO · Manager</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ───── Main ───── -->
+  <main class="portal-main">
+
+    <div class="portal-topbar">
+      <div style="display:flex; gap:14px; align-items:center;">
+        <button class="hamb" onclick="PV.toggleSidebar()" aria-label="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <div class="crumbs">
+          <span>Manager</span><span class="sep">/</span>
+          <span>Cycle 2026.Q2</span><span class="sep">/</span>
+          <span class="cur" id="crumbCur">Overview</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div class="search-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <span>Search employees, campaigns…</span>
+          <kbd>⌘K</kbd>
+        </div>
+        <button class="btn ghost sm" style="position:relative;">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 004 0"/></svg>
+          <span style="position:absolute; top:-2px; right:-2px; width:8px; height:8px; background:var(--red); border-radius:50%; box-shadow: 0 0 6px var(--red);"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ────── OVERVIEW ────── -->
+    <section class="screen show" id="screen-overview">
+      <div class="page-head">
+        <div>
+          <span class="tag cyan">CYCLE 2026.Q2 · LIVE</span>
+          <h1 style="margin-top:14px;">Operations Overview</h1>
+          <p class="lede">Org-wide cyber awareness signal across 214 active learners and 3 running campaigns.</p>
+        </div>
+        <div class="page-head-actions">
+          <button class="btn ghost sm">Export</button>
+          <button class="btn primary sm" onclick="showScreen('new')">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            New Campaign
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi reveal">
+          <div class="kpi-top"><span class="kpi-label">CYBER SCORE</span><span class="tag cyan">ORG</span></div>
+          <div class="kpi-val"><span data-counter data-target="72">0</span><span style="color:var(--muted); font-size:18px;"> /100</span></div>
+          <div class="kpi-trend">▲ 11 vs Q1</div>
+          <svg class="kpi-spark" width="80" height="40" viewBox="0 0 80 40"><polyline points="0,30 12,28 24,32 36,24 48,20 60,14 72,10 80,8" fill="none" stroke="var(--cyan)" stroke-width="1.5" /></svg>
+        </div>
+        <div class="kpi gold reveal delay-1">
+          <div class="kpi-top"><span class="kpi-label">SIMS DELIVERED</span><span class="tag gold">QTD</span></div>
+          <div class="kpi-val"><span data-counter data-target="3210">0</span></div>
+          <div class="kpi-trend">▲ 22% vs cycle</div>
+          <svg class="kpi-spark" width="80" height="40" viewBox="0 0 80 40"><polyline points="0,32 12,28 24,30 36,22 48,24 60,16 72,12 80,6" fill="none" stroke="var(--gold)" stroke-width="1.5" /></svg>
+        </div>
+        <div class="kpi red reveal delay-2">
+          <div class="kpi-top"><span class="kpi-label">CLICK RATE</span><span class="tag red">FAIL</span></div>
+          <div class="kpi-val"><span data-counter data-target="18" data-suffix="%">0%</span></div>
+          <div class="kpi-trend down">▼ 6 pts &mdash; improving</div>
+          <svg class="kpi-spark" width="80" height="40" viewBox="0 0 80 40"><polyline points="0,8 12,12 24,10 36,18 48,16 60,22 72,26 80,30" fill="none" stroke="var(--red)" stroke-width="1.5" /></svg>
+        </div>
+        <div class="kpi green reveal delay-3">
+          <div class="kpi-top"><span class="kpi-label">CERTIFIED · CYCLE</span><span class="tag green">PASS</span></div>
+          <div class="kpi-val"><span data-counter data-target="148">0</span><span style="color:var(--muted); font-size:18px;"> /214</span></div>
+          <div class="kpi-trend">69% completion</div>
+          <svg class="kpi-spark" width="80" height="40" viewBox="0 0 80 40"><polyline points="0,30 12,26 24,22 36,20 48,16 60,14 72,8 80,6" fill="none" stroke="var(--green)" stroke-width="1.5" /></svg>
+        </div>
+      </div>
+
+      <div class="panel-grid">
+        <!-- Campaign chart -->
+        <div class="card reveal">
+          <div class="card-head"><div><h3>Campaign Analytics</h3><span class="sub">Click-rate vs reported · last 12 weeks</span></div>
+            <div style="display:flex; gap:10px;">
+              <span class="tag cyan">CLICKS</span>
+              <span class="tag green">REPORTED</span>
+            </div>
+          </div>
+          <div class="chart">
+            <svg viewBox="0 0 600 220" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="grdClick" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="rgba(24,232,255,0.4)"/>
+                  <stop offset="1" stop-color="rgba(24,232,255,0)"/>
+                </linearGradient>
+                <linearGradient id="grdRep" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="rgba(0,232,122,0.4)"/>
+                  <stop offset="1" stop-color="rgba(0,232,122,0)"/>
+                </linearGradient>
+              </defs>
+              <g class="grid">
+                <line x1="0" y1="0" x2="600" y2="0"/>
+                <line x1="0" y1="55" x2="600" y2="55"/>
+                <line x1="0" y1="110" x2="600" y2="110"/>
+                <line x1="0" y1="165" x2="600" y2="165"/>
+                <line x1="0" y1="220" x2="600" y2="220" stroke="rgba(239,243,255,0.12)"/>
+              </g>
+              <!-- Reported area -->
+              <path d="M0,180 L50,160 L100,140 L150,150 L200,130 L250,110 L300,100 L350,80 L400,70 L450,60 L500,50 L550,40 L600,30 L600,220 L0,220 Z" fill="url(#grdRep)"/>
+              <path d="M0,180 L50,160 L100,140 L150,150 L200,130 L250,110 L300,100 L350,80 L400,70 L450,60 L500,50 L550,40 L600,30" fill="none" stroke="var(--green)" stroke-width="2"/>
+              <!-- Click area -->
+              <path d="M0,40 L50,55 L100,80 L150,70 L200,90 L250,110 L300,130 L350,140 L400,150 L450,160 L500,170 L550,180 L600,185 L600,220 L0,220 Z" fill="url(#grdClick)"/>
+              <path d="M0,40 L50,55 L100,80 L150,70 L200,90 L250,110 L300,130 L350,140 L400,150 L450,160 L500,170 L550,180 L600,185" fill="none" stroke="var(--cyan)" stroke-width="2"/>
+              <!-- end markers -->
+              <circle cx="600" cy="30" r="4" fill="var(--green)"/>
+              <circle cx="600" cy="185" r="4" fill="var(--cyan)"/>
+              <!-- axis labels -->
+              <g class="axis-label">
+                <text x="0" y="215">W&minus;12</text>
+                <text x="290" y="215">W&minus;06</text>
+                <text x="570" y="215">NOW</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Threat feed -->
+        <div class="card reveal delay-1">
+          <div class="card-head"><div><h3>Threat Alerts</h3><span class="sub">Real-time · last 24h</span></div><span class="tag red">04 OPEN</span></div>
+          <div class="feed">
+            <div class="feed-item">
+              <div class="feed-icon" style="background:rgba(255,61,87,0.12); color:var(--red); border:1px solid rgba(255,61,87,0.3);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+              </div>
+              <div><div class="ttl">Reception cohort: 7/9 vishing failures</div><div class="when" style="color:var(--muted);">Auto-suggest "Calm Refuse" drill</div></div>
+              <span class="when">04m</span>
+            </div>
+            <div class="feed-item">
+              <div class="feed-icon" style="background:rgba(245,197,24,0.12); color:var(--gold); border:1px solid rgba(245,197,24,0.3);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 17h.01"/></svg>
+              </div>
+              <div><div class="ttl">Finance regression: &minus;14% since Q1</div><div class="when" style="color:var(--muted);">23 users flagged for CEO-fraud refresher</div></div>
+              <span class="when">21m</span>
+            </div>
+            <div class="feed-item">
+              <div class="feed-icon" style="background:rgba(168,85,247,0.12); color:var(--purple); border:1px solid rgba(168,85,247,0.3);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+              </div>
+              <div><div class="ttl">New quishing variant detected in wild</div><div class="when" style="color:var(--muted);">Patched simulation library &middot; auto-deployed</div></div>
+              <span class="when">1h</span>
+            </div>
+            <div class="feed-item">
+              <div class="feed-icon" style="background:rgba(24,232,255,0.12); color:var(--cyan); border:1px solid rgba(24,232,255,0.3);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M21 12v6a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h11"/></svg>
+              </div>
+              <div><div class="ttl">42 employees passed Final Exam today</div><div class="when" style="color:var(--muted);">Certificates auto-issued via HRIS</div></div>
+              <span class="when">2h</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <div class="card reveal">
+          <div class="card-head"><div><h3>Employee Progress · Top Movers</h3><span class="sub">Highest delta this cycle</span></div><a href="#employees" class="btn ghost sm" onclick="showScreen('employees'); return false;">View all 214</a></div>
+          <table class="data-table">
+            <thead><tr><th>Employee</th><th>Department</th><th>Cycle progress</th><th>Score</th><th>Status</th></tr></thead>
+            <tbody id="overviewEmpBody">
+              <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">LOADING…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── EMPLOYEES ────── -->
+    <section class="screen" id="screen-employees">
+      <div class="page-head">
+        <div>
+          <span class="tag cyan">214 ACTIVE</span>
+          <h1 style="margin-top:14px;">Employees</h1>
+          <p class="lede">Full roster across the 2026.Q2 cycle. Filter by department, risk band, or progress.</p>
+        </div>
+        <div class="page-head-actions">
+          <button class="btn ghost sm">Invite</button>
+          <button class="btn primary sm">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:18px; margin-bottom:18px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="chip on">All · 214</button>
+          <button class="chip">Finance · 42</button>
+          <button class="chip">Reception · 18</button>
+          <button class="chip">HR · 24</button>
+          <button class="chip">IT · 36</button>
+          <button class="chip">Marketing · 28</button>
+          <button class="chip">Engineering · 66</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <table class="data-table" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="padding-left:28px;">Employee</th>
+              <th>Department</th>
+              <th>Bias Profile</th>
+              <th>Progress</th>
+              <th>Score</th>
+              <th>Stage</th>
+              <th style="padding-right:28px;"></th>
+            </tr>
+          </thead>
+          <tbody id="empBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ────── CAMPAIGNS ────── -->
+    <section class="screen" id="screen-campaigns">
+      <div class="page-head">
+        <div>
+          <span class="tag gold">3 LIVE · 2 SCHEDULED</span>
+          <h1 style="margin-top:14px;">Campaigns</h1>
+          <p class="lede">AI-authored attack simulations scoped per department, attack type, and difficulty.</p>
+        </div>
+        <div class="page-head-actions">
+          <button class="btn primary sm" onclick="showScreen('new')">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            New Campaign
+          </button>
+        </div>
+      </div>
+
+      <div class="grid-three">
+        <article class="card glow-card" style="cursor:none;">
+          <div class="card-head"><div><h3>Q2 Treasury Cohort</h3><span class="sub">Industry · Banking</span></div><span class="tag cyan">RUNNING</span></div>
+          <div style="margin-bottom: 18px;"><span class="tag muted">CEO&nbsp;Fraud</span> <span class="tag muted">Vishing</span> <span class="tag muted">Quishing</span></div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Engaged</span><span class="mono" style="color:var(--cyan);">68 / 84</span></div>
+              <div class="bar"><div class="bar-fill" data-w="81"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Click rate</span><span class="mono" style="color:var(--red);">23%</span></div>
+              <div class="bar"><div class="bar-fill red" data-w="23"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:0.1em;">DAY 7 / 14</div>
+        </article>
+
+        <article class="card glow-card">
+          <div class="card-head"><div><h3>Reception · Voice Drills</h3><span class="sub">Industry · Hospitality</span></div><span class="tag red">CRITICAL</span></div>
+          <div style="margin-bottom: 18px;"><span class="tag muted">Vishing</span> <span class="tag muted">HR&nbsp;Authority</span></div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Engaged</span><span class="mono" style="color:var(--cyan);">18 / 18</span></div>
+              <div class="bar"><div class="bar-fill" data-w="100"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Click rate</span><span class="mono" style="color:var(--red);">78%</span></div>
+              <div class="bar"><div class="bar-fill red" data-w="78"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:0.1em;">DAY 11 / 14</div>
+        </article>
+
+        <article class="card glow-card">
+          <div class="card-head"><div><h3>Marketing · Brand Spoof</h3><span class="sub">Industry · SaaS</span></div><span class="tag gold">RUNNING</span></div>
+          <div style="margin-bottom: 18px;"><span class="tag muted">Email</span> <span class="tag muted">QR&nbsp;Phishing</span></div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Engaged</span><span class="mono" style="color:var(--cyan);">22 / 28</span></div>
+              <div class="bar"><div class="bar-fill gold" data-w="78"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Click rate</span><span class="mono" style="color:var(--gold);">42%</span></div>
+              <div class="bar"><div class="bar-fill gold" data-w="42"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:0.1em;">DAY 4 / 10</div>
+        </article>
+
+        <article class="card" style="border-style:dashed; cursor:none;" onclick="showScreen('new')">
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; padding:24px;">
+            <div style="width:48px; height:48px; border-radius:50%; border:1px solid var(--line-strong); display:grid; place-items:center; color:var(--cyan); margin-bottom:14px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <h3 style="font-size:16px; font-family:var(--font-body); font-weight:500;">Author a new campaign</h3>
+            <p style="font-size:13px; color:var(--muted); margin-top:6px;">AI-generated · industry-aware · ready in 90 seconds.</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head"><div><h3>Eng · USB Drop</h3><span class="sub">Industry · Software</span></div><span class="tag purple">SCHEDULED</span></div>
+          <p style="font-size:13px; color:var(--muted); margin: 8px 0 18px;">Physical "lost" branded drives placed in HQ common areas. Telemetry via HID detection.</p>
+          <div style="display:flex; justify-content:space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.12em;">
+            <span>STARTS · 02 JUN</span>
+            <span>66 SEATS</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head"><div><h3>HR · Bonus Wave</h3><span class="sub">Industry · Cross-functional</span></div><span class="tag purple">SCHEDULED</span></div>
+          <p style="font-size:13px; color:var(--muted); margin: 8px 0 18px;">Authority + reward trigger pairing — fake payroll/bonus letters timed to review windows.</p>
+          <div style="display:flex; justify-content:space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.12em;">
+            <span>STARTS · 09 JUN</span>
+            <span>214 SEATS</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ────── HEATMAP ────── -->
+    <section class="screen" id="screen-heatmap">
+      <div class="page-head">
+        <div>
+          <span class="tag red">5 RISK ZONES</span>
+          <h1 style="margin-top:14px;">Risk Heatmap</h1>
+          <p class="lede">Department-level exposure based on simulation engagement, lecture completion, and bias profile.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><h3>By Department · Cycle 2026.Q2</h3><span class="sub">Composite risk score · 0&ndash;100</span></div></div>
+
+        <div class="heatmap">
+          <div class="heat-cell t5"><div><div class="dep">Reception</div><div class="micro">18 seats</div></div><div class="pct">91%</div></div>
+          <div class="heat-cell t5"><div><div class="dep">Finance</div><div class="micro">42 seats</div></div><div class="pct">88%</div></div>
+          <div class="heat-cell t4"><div><div class="dep">Marketing</div><div class="micro">28 seats</div></div><div class="pct">74%</div></div>
+          <div class="heat-cell t3"><div><div class="dep">HR</div><div class="micro">24 seats</div></div><div class="pct">62%</div></div>
+          <div class="heat-cell t1"><div><div class="dep">IT</div><div class="micro">36 seats</div></div><div class="pct">35%</div></div>
+
+          <div class="heat-cell t4"><div><div class="dep">Procurement</div><div class="micro">14 seats</div></div><div class="pct">69%</div></div>
+          <div class="heat-cell t3"><div><div class="dep">Legal</div><div class="micro">9 seats</div></div><div class="pct">58%</div></div>
+          <div class="heat-cell t2"><div><div class="dep">Sales</div><div class="micro">31 seats</div></div><div class="pct">47%</div></div>
+          <div class="heat-cell t2"><div><div class="dep">Engineering</div><div class="micro">66 seats</div></div><div class="pct">41%</div></div>
+          <div class="heat-cell t1"><div><div class="dep">SecOps</div><div class="micro">7 seats</div></div><div class="pct">14%</div></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--muted);">
+          <span><span style="display:inline-block; width:10px; height:10px; background:var(--green); border-radius:3px; margin-right:6px; vertical-align:middle;"></span>HARDENED 0&ndash;39</span>
+          <span><span style="display:inline-block; width:10px; height:10px; background:var(--cyan); border-radius:3px; margin-right:6px; vertical-align:middle;"></span>STABLE 40&ndash;54</span>
+          <span><span style="display:inline-block; width:10px; height:10px; background:var(--purple); border-radius:3px; margin-right:6px; vertical-align:middle;"></span>MONITOR 55&ndash;65</span>
+          <span><span style="display:inline-block; width:10px; height:10px; background:var(--gold); border-radius:3px; margin-right:6px; vertical-align:middle;"></span>ELEVATED 66&ndash;79</span>
+          <span><span style="display:inline-block; width:10px; height:10px; background:var(--red); border-radius:3px; margin-right:6px; vertical-align:middle;"></span>CRITICAL 80+</span>
+        </div>
+      </div>
+
+      <div class="grid-two" style="margin-top: 20px;">
+        <div class="card">
+          <div class="card-head"><div><h3>Top 5 At-Risk Cohorts</h3><span class="sub">Action recommended</span></div></div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;"><span>Reception · vishing</span><span class="mono" style="color:var(--red);">91</span></div>
+              <div class="bar"><div class="bar-fill red" data-w="91"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;"><span>Finance · CEO fraud</span><span class="mono" style="color:var(--red);">88</span></div>
+              <div class="bar"><div class="bar-fill red" data-w="88"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;"><span>Marketing · brand spoof</span><span class="mono" style="color:var(--gold);">74</span></div>
+              <div class="bar"><div class="bar-fill gold" data-w="74"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;"><span>Procurement · vendor swap</span><span class="mono" style="color:var(--gold);">69</span></div>
+              <div class="bar"><div class="bar-fill gold" data-w="69"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;"><span>HR · onboarding spoof</span><span class="mono" style="color:var(--purple);">62</span></div>
+              <div class="bar"><div class="bar-fill purple" data-w="62"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Bias Vectors · Org-wide</h3><span class="sub">Average across 214 learners</span></div></div>
+          <div class="bias-row" style="display:grid; grid-template-columns:130px 1fr 60px; align-items:center; gap:16px; margin-bottom:18px;">
+            <span style="font-size:13px;">Urgency</span>
+            <div class="bar"><div class="bar-fill red" data-w="68"></div></div>
+            <span class="mono" style="font-size:12px; color: var(--red); text-align:right;">68</span>
+          </div>
+          <div class="bias-row" style="display:grid; grid-template-columns:130px 1fr 60px; align-items:center; gap:16px; margin-bottom:18px;">
+            <span style="font-size:13px;">Authority</span>
+            <div class="bar"><div class="bar-fill gold" data-w="74"></div></div>
+            <span class="mono" style="font-size:12px; color: var(--gold); text-align:right;">74</span>
+          </div>
+          <div class="bias-row" style="display:grid; grid-template-columns:130px 1fr 60px; align-items:center; gap:16px; margin-bottom:18px;">
+            <span style="font-size:13px;">Reward</span>
+            <div class="bar"><div class="bar-fill purple" data-w="51"></div></div>
+            <span class="mono" style="font-size:12px; color: var(--purple); text-align:right;">51</span>
+          </div>
+          <div class="bias-row" style="display:grid; grid-template-columns:130px 1fr 60px; align-items:center; gap:16px;">
+            <span style="font-size:13px;">Fear</span>
+            <div class="bar"><div class="bar-fill green" data-w="32"></div></div>
+            <span class="mono" style="font-size:12px; color: var(--green); text-align:right;">32</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── AI REPORTS ────── -->
+    <section class="screen" id="screen-reports">
+      <div class="page-head">
+        <div>
+          <span class="tag purple">GPT&nbsp;ENGINE · ACTIVE</span>
+          <h1 style="margin-top:14px;">AI Reports</h1>
+          <p class="lede">Executive summaries auto-written for board, audit, and ISO 27001 reporting. Refreshed nightly.</p>
+        </div>
+        <div class="page-head-actions">
+          <button class="btn ghost sm">Schedule Email</button>
+          <button class="btn primary sm">Generate Now</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-head">
+          <div><h3>Executive Brief · Cycle 2026.Q2</h3><span class="sub">Auto-written · 22 May 2026 · 04:21 GMT</span></div>
+          <div style="display:flex; gap:8px;"><span class="tag purple">GPT</span><span class="tag muted">v4.2</span></div>
+        </div>
+        <p style="font-size: 15px; line-height: 1.7; color: #C7D0E8; margin: 0 0 18px;">
+          The organisation's composite cyber awareness score climbed from 61 to <strong style="color:var(--cyan);">72</strong> this cycle &mdash; an 18% improvement driven primarily by hardening across the Engineering and SecOps cohorts. Click-through on simulated email phishing fell to 18%, well below the 24% industry benchmark.
+        </p>
+        <p style="font-size: 15px; line-height: 1.7; color: #C7D0E8; margin: 0 0 18px;">
+          Three risk pockets remain. <strong style="color:var(--red);">Reception</strong> (91) and <strong style="color:var(--red);">Finance</strong> (88) failed the majority of voice-cloned helpdesk drills, with median resistance time under 60 seconds. <strong style="color:var(--gold);">Marketing</strong> showed elevated quishing exposure following an offsite event.
+        </p>
+        <p style="font-size: 15px; line-height: 1.7; color: #C7D0E8; margin: 0;">
+          Recommended action: deploy the "Calm Refuse" drill bundle to Reception and Finance, schedule a quishing refresher for Marketing post-conference, and queue the standard Q3 cycle for 01 July 2026.
+        </p>
+
+        <div style="display:flex; gap:10px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line);">
+          <button class="btn ghost sm">Export PDF</button>
+          <button class="btn ghost sm">Share with board</button>
+          <button class="btn ghost sm" style="margin-left:auto;">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="3 7 12 13 21 7"/><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7"/><path d="M3 7l9-5 9 5"/></svg>
+            Open in Mail
+          </button>
+        </div>
+      </div>
+
+      <div class="grid-two">
+        <div class="card">
+          <div class="card-head"><div><h3>Top Recommendations</h3><span class="sub">Prioritised by impact &middot; AI</span></div></div>
+          <ol style="margin:0; padding-left:18px; color:#C7D0E8; font-size: 14px; line-height: 1.8;">
+            <li>Deploy <strong>Calm Refuse</strong> bundle to Reception &amp; Finance (est. impact: &minus;42% vishing fail rate).</li>
+            <li>Trigger CEO-fraud refresher for 23 flagged Finance users (est. cycle gain: +9 score).</li>
+            <li>Add quishing module to Marketing onboarding (est. impact: &minus;28% click rate at offsites).</li>
+            <li>Promote SecOps cohort to peer-mentor tier for cross-department drills.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Compliance Mapping</h3><span class="sub">Coverage per framework</span></div></div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>ISO 27001 · A.7.2.2</span><span class="mono" style="color:var(--green);">100%</span></div><div class="bar"><div class="bar-fill green" data-w="100"></div></div></div>
+            <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>NIST CSF · PR.AT</span><span class="mono" style="color:var(--green);">94%</span></div><div class="bar"><div class="bar-fill green" data-w="94"></div></div></div>
+            <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>SOC 2 · CC1.4</span><span class="mono" style="color:var(--cyan);">88%</span></div><div class="bar"><div class="bar-fill" data-w="88"></div></div></div>
+            <div><div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;"><span>GDPR · Art. 32</span><span class="mono" style="color:var(--gold);">76%</span></div><div class="bar"><div class="bar-fill gold" data-w="76"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── MCQ RESULTS ────── -->
+    <section class="screen" id="screen-mcq">
+      <div class="page-head">
+        <div>
+          <span class="tag cyan">12-QUESTION&nbsp;ADAPTIVE</span>
+          <h1 style="margin-top:14px;">MCQ Results</h1>
+          <p class="lede">Question-level performance across all certified employees this cycle.</p>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi">
+          <span class="kpi-label">PASS RATE</span>
+          <div class="kpi-val"><span data-counter data-target="83" data-suffix="%">0%</span></div>
+          <div class="kpi-trend">▲ 6 pts</div>
+        </div>
+        <div class="kpi gold">
+          <span class="kpi-label">MEDIAN SCORE</span>
+          <div class="kpi-val"><span data-counter data-target="9.2" data-decimals="1">0</span><span style="color:var(--muted); font-size:18px;"> /12</span></div>
+          <div class="kpi-trend">▲ 1.1</div>
+        </div>
+        <div class="kpi red">
+          <span class="kpi-label">WORST QUESTION</span>
+          <div class="kpi-val">Q07</div>
+          <div class="kpi-trend down">38% correct</div>
+        </div>
+        <div class="kpi green">
+          <span class="kpi-label">RETAKE RATE</span>
+          <div class="kpi-val"><span data-counter data-target="11" data-suffix="%">0%</span></div>
+          <div class="kpi-trend down">▼ 4 pts</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><h3>Question Breakdown</h3><span class="sub">% correct across 148 attempts</span></div></div>
+        <div id="qBreakdown"></div>
+      </div>
+    </section>
+
+    <!-- ────── NEW CAMPAIGN ────── -->
+    <section class="screen" id="screen-new">
+      <div class="page-head">
+        <div>
+          <span class="tag gold">CAMPAIGN&nbsp;BUILDER</span>
+          <h1 style="margin-top:14px;">Author a new campaign</h1>
+          <p class="lede">AI generates the email, vishing script, and landing page — grounded in your org's industry context.</p>
+        </div>
+      </div>
+
+      <div class="builder-grid">
+        <div class="card">
+          <div style="display:flex; flex-direction:column; gap: 24px;">
+            <div class="field">
+              <label>Campaign name</label>
+              <input class="input" value="Q2 Reception · Calm Refuse" />
+            </div>
+
+            <div class="field">
+              <label>Domain</label>
+              <select class="select" id="domainSelect">
+                <option value="Finance">Finance — CEO Fraud + Email Phishing</option>
+                <option value="HR">HR — Authority + Vishing</option>
+                <option value="General" selected>General — All attack vectors</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Active attack vectors</label>
+              <div class="chip-group" id="atkChips" style="pointer-events:none;opacity:0.7;">
+                <span class="chip on">Email Phishing</span>
+                <span class="chip on">CEO Fraud</span>
+                <span class="chip on">Vishing</span>
+                <span class="chip on">QR Phishing</span>
+                <span class="chip on">USB Attack</span>
+                <span class="chip on">HR Authority</span>
+              </div>
+              <p style="font-size:11px;color:var(--muted);margin-top:8px;font-family:var(--font-mono);letter-spacing:0.1em;">EVENTS ARE SET BY DOMAIN — CANNOT BE OVERRIDDEN</p>
+            </div>
+
+            <div class="field">
+              <label>Difficulty</label>
+              <div class="difficulty-row" id="diffRow">
+                <button class="chip" data-diff>Onboarding</button>
+                <button class="chip on" data-diff>Standard</button>
+                <button class="chip" data-diff>Elevated</button>
+                <button class="chip" data-diff>Red&nbsp;Team</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Industry context</label>
+              <select class="select">
+                <option>Banking &amp; Treasury</option>
+                <option>Hospitality &amp; Front Desk</option>
+                <option>Software · SaaS</option>
+                <option>Healthcare</option>
+                <option>Manufacturing &amp; Supply Chain</option>
+                <option>Public Sector</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Schedule</label>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input class="input" value="01 Jun 2026" />
+                <input class="input" value="14 days" />
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top: 8px;">
+              <button class="btn ghost sm">Save as draft</button>
+              <button class="btn primary sm" id="deployBtn">
+                Deploy campaign
+                <svg class="btn-icon arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-preview">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom: 14px;">
+            <div style="width:28px; height:28px; border-radius:50%; background: linear-gradient(135deg, var(--purple), var(--cyan)); display:grid; place-items:center; color:#001218;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2 4 4 2-4 2-2 4-2-4-4-2 4-2z"/></svg>
+            </div>
+            <div>
+              <h4 style="margin:0;">AI Author Brief</h4>
+              <div style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.18em; color:var(--muted); text-transform:uppercase; margin-top:2px;">PHISHVERSE · CONTEXT&nbsp;ENGINE</div>
+            </div>
+          </div>
+
+          <div class="mono-body" id="aiText">
+            <span style="color:var(--cyan);">&gt;</span> Cohort: <span style="color:var(--text);">Reception (18 seats)</span><br/>
+            <span style="color:var(--cyan);">&gt;</span> Industry framing: hospitality &middot; front desk<br/>
+            <span style="color:var(--cyan);">&gt;</span> Composing vishing scripts × 3 + email decoys × 2<br/>
+            <span style="color:var(--cyan);">&gt;</span> Bias targets: <span style="color:var(--gold);">authority · 0.74</span> &middot; <span style="color:var(--red);">urgency · 0.68</span><br/>
+            <span style="color:var(--cyan);">&gt;</span> Estimated impact: <span style="color:var(--green);">&minus;42% fail rate</span> in 14 days<br/>
+            <span style="color:var(--cyan);">&gt;</span> Status: <span class="typing" style="color:var(--cyan);">awaiting deploy</span>
+          </div>
+
+          <div style="border-top: 1px solid var(--line); padding-top: 18px; margin-top: 20px;">
+            <div style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; margin-bottom:10px;">SAMPLE&nbsp;LURE&nbsp;EMAIL · PREVIEW</div>
+            <div style="background: rgba(239,243,255,0.03); border: 1px solid var(--line); border-radius: 10px; padding: 18px;">
+              <div style="font-size:11px; color:var(--muted); font-family:var(--font-mono); letter-spacing:0.1em; margin-bottom:8px;">FROM&nbsp;·&nbsp;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dcb5a8f1b4b9b0acb8b9afb79ca5b3a9aebfb3f1b5a8f2bfb3b1">[email&#160;protected]</a></div>
+              <div style="font-weight:600; font-size:14px; margin-bottom:8px;">Action required: VPN certificate expires in 38 minutes</div>
+              <div style="font-size:13px; color:#C7D0E8; line-height:1.6;">Hi — our automated system flagged your VPN cert as expiring this morning. Please confirm your 6-digit MFA code so we can reissue before your 09:00 meeting…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── SETTINGS ────── -->
+    <section class="screen" id="screen-settings">
+      <div class="page-head">
+        <div>
+          <span class="tag muted">ORG&nbsp;LEVEL</span>
+          <h1 style="margin-top:14px;">Settings</h1>
+          <p class="lede">Org-wide configuration for the PHISHVERSE platform.</p>
+        </div>
+      </div>
+
+      <div class="grid-two">
+        <div class="card">
+          <div class="card-head"><div><h3>Cycle &amp; Scheduling</h3><span class="sub">Cadence and rollout windows</span></div></div>
+          <div class="setting-row">
+            <div><div class="title">Quarterly cycles</div><div class="desc">Run a full cycle every 90 days.</div></div>
+            <div class="toggle on" data-toggle></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="title">Auto-enrol new hires</div><div class="desc">Hooked into HRIS via SCIM.</div></div>
+            <div class="toggle on" data-toggle></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="title">Repeat failed cycles</div><div class="desc">Re-queue employees who don't certify.</div></div>
+            <div class="toggle on" data-toggle></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="title">Quiet hours (no sims)</div><div class="desc">Suppress drills 22:00 – 06:00 local.</div></div>
+            <div class="toggle" data-toggle></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>AI &amp; Telemetry</h3><span class="sub">Engine behaviour and data policy</span></div></div>
+          <div class="setting-row">
+            <div><div class="title">AI campaign authoring</div><div class="desc">Allow the engine to generate lures end-to-end.</div></div>
+            <div class="toggle on" data-toggle></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="title">Adaptive difficulty</div><div class="desc">Escalate exam difficulty per learner.</div></div>
+            <div class="toggle on" data-toggle></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="title">Anonymous benchmarks</div><div class="desc">Compare org score to industry peers.</div></div>
+            <div class="toggle on" data-toggle></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="title">90-day telemetry purge</div><div class="desc">Auto-delete raw click data after 90 days.</div></div>
+            <div class="toggle on" data-toggle></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Integrations</h3><span class="sub">Connected systems · 4</span></div></div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid var(--line); border-radius:10px; background:rgba(239,243,255,0.02);">
+              <div><div style="font-weight:500;">Okta SSO</div><div style="font-size:12px; color:var(--muted);">214 users synced</div></div>
+              <span class="tag green">CONNECTED</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid var(--line); border-radius:10px; background:rgba(239,243,255,0.02);">
+              <div><div style="font-weight:500;">Workday HRIS</div><div style="font-size:12px; color:var(--muted);">SCIM 2.0 active</div></div>
+              <span class="tag green">CONNECTED</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid var(--line); border-radius:10px; background:rgba(239,243,255,0.02);">
+              <div><div style="font-weight:500;">Slack</div><div style="font-size:12px; color:var(--muted);">Threat alerts → #sec-aware</div></div>
+              <span class="tag green">CONNECTED</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid var(--line); border-radius:10px; background:rgba(239,243,255,0.02);">
+              <div><div style="font-weight:500;">Splunk SIEM</div><div style="font-size:12px; color:var(--muted);">Telemetry forwarder · v2.4</div></div>
+              <span class="tag green">CONNECTED</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Branding</h3><span class="sub">Certificate and email styling</span></div></div>
+          <div class="field" style="margin-bottom:18px;">
+            <label>Organisation name</label>
+            <input class="input" value="Acme Holdings Plc" />
+          </div>
+          <div class="field" style="margin-bottom:18px;">
+            <label>Accent palette</label>
+            <div style="display:flex; gap:10px;">
+              <div style="flex:1; height:36px; border-radius:8px; background:linear-gradient(135deg, var(--cyan), var(--teal)); border:1px solid rgba(24,232,255,0.5);"></div>
+              <div style="flex:1; height:36px; border-radius:8px; background:linear-gradient(135deg, var(--gold), #FFB800); border:1px solid var(--line);"></div>
+              <div style="flex:1; height:36px; border-radius:8px; background:linear-gradient(135deg, var(--purple), #C084FC); border:1px solid var(--line);"></div>
+              <div style="flex:1; height:36px; border-radius:8px; background:linear-gradient(135deg, var(--green), var(--teal)); border:1px solid var(--line);"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Certificate signing authority</label>
+            <input class="input mono" value="cn=ciso@acme.io · x509" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="app.js"></script>
+<script>
+  // ─── Sidebar nav ───
+  const navItems = document.querySelectorAll('.nav-item');
+  const screens = document.querySelectorAll('.screen');
+  const labels = {
+    overview: 'Overview', employees: 'Employees', campaigns: 'Campaigns',
+    heatmap: 'Risk Heatmap', reports: 'AI Reports', mcq: 'MCQ Results',
+    new: 'New Campaign', settings: 'Settings'
+  };
+
+  window.showScreen = function (name) {
+    screens.forEach(s => s.classList.toggle('show', s.id === 'screen-' + name));
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.screen === name));
+    document.getElementById('crumbCur').textContent = labels[name] || name;
+    document.querySelector('.sidebar')?.classList.remove('open');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // re-animate bars
+    const active = document.querySelector('.screen.show');
+    if (active) {
+      active.querySelectorAll('.bar-fill[data-w]').forEach(b => {
+        const w = b.dataset.w;
+        b.style.width = '0%';
+        setTimeout(() => b.style.width = w + '%', 120);
+      });
+      active.querySelectorAll('[data-counter]').forEach(el => {
+        if (!el._done) {
+          el._done = true;
+          // counters fire on intersection; re-set their text
+        }
+      });
+    }
+  };
+
+  navItems.forEach(n => {
+    n.addEventListener('click', (e) => {
+      e.preventDefault();
+      showScreen(n.dataset.screen);
+    });
+  });
+
+  function routeFromHash() {
+    const h = location.hash.replace('#', '');
+    if (h && labels[h]) showScreen(h);
+  }
+  window.addEventListener('hashchange', routeFromHash);
+  routeFromHash();
+
+  // ─── Register real employee loaders ───
+  PV.onScreenShow('employees', PV.loadEmployees);
+  PV.onScreenShow('overview',  PV.loadOverviewEmployees);
+
+  // ─── MCQ breakdown ───
+  const qData = [
+    [1, 'Recognise CEO wire spoofing', 96, 'green'],
+    [2, 'Verify sender domain', 91, 'green'],
+    [3, 'Refuse MFA code over phone', 88, 'green'],
+    [4, 'Spot typo-squat URL', 72, 'cyan'],
+    [5, 'QR landing-page verification', 58, 'gold'],
+    [6, 'Vendor banking detail change', 47, 'gold'],
+    [7, 'Voice-cloned helpdesk script', 38, 'red'],
+    [8, 'HR onboarding spoof', 61, 'cyan'],
+    [9, 'USB drive procedure', 84, 'green'],
+    [10, 'Macro-enabled attachment', 79, 'cyan'],
+    [11, 'OAuth consent abuse', 55, 'gold'],
+    [12, 'Pre-text identity request', 67, 'cyan'],
+  ];
+  const qB = document.getElementById('qBreakdown');
+  qData.forEach(([n, t, p, c]) => {
+    const row = document.createElement('div');
+    row.className = 'question-row';
+    row.innerHTML = `
+      <span class="q-num">Q${String(n).padStart(2,'0')}</span>
+      <div class="q-bar-wrap"><div style="font-size:13px;">${t}</div></div>
+      <div class="bar" style="width:120px; justify-self: end;"><div class="bar-fill ${c === 'green' ? 'green' : c === 'gold' ? 'gold' : c === 'red' ? 'red' : ''}" data-w="${p}"></div></div>
+      <span class="mono" style="text-align:right; color: var(--${c});">${p}%</span>
+    `;
+    qB.appendChild(row);
+  });
+
+  // ─── Domain selector → update chip preview ───
+  const DOMAIN_EVENTS_MAP = {
+    Finance: ['Email Phishing', 'CEO Fraud'],
+    HR:      ['HR Authority', 'Vishing'],
+    General: ['Email Phishing', 'CEO Fraud', 'Vishing', 'QR Phishing', 'USB Attack', 'HR Authority'],
+  };
+  const ALL_CHIPS = ['Email Phishing', 'CEO Fraud', 'Vishing', 'QR Phishing', 'USB Attack', 'HR Authority'];
+  document.getElementById('domainSelect')?.addEventListener('change', (e) => {
+    const active = new Set(DOMAIN_EVENTS_MAP[e.target.value] || ALL_CHIPS);
+    document.querySelectorAll('#atkChips span.chip').forEach(c => {
+      c.classList.toggle('on', active.has(c.textContent.trim()));
+    });
+  });
+
+  // ─── Chip toggles ───
+  document.querySelectorAll('[data-tog]').forEach(c => {
+    c.addEventListener('click', () => c.classList.toggle('on'));
+  });
+  document.querySelectorAll('[data-diff]').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('[data-diff]').forEach(x => x.classList.remove('on'));
+      c.classList.add('on');
+    });
+  });
+
+  // ─── Settings toggles ───
+  document.querySelectorAll('[data-toggle]').forEach(t => {
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+
+  // ─── Deploy (real Flask API) ───
+  document.getElementById('deployBtn').addEventListener('click', async () => {
+    const btn    = document.getElementById('deployBtn');
+    const nameEl = document.querySelector('#screen-new input.input');
+    const domSel = document.getElementById('domainSelect');
+    const durEl  = document.querySelectorAll('#screen-new input.input')[1];
+
+    const name     = nameEl?.value?.trim() || 'New Campaign';
+    const domain   = domSel?.value || 'General';
+    const duration = parseInt(durEl?.value) || 14;
+
+    btn.disabled = true;
+    btn.textContent = 'Deploying…';
+    try {
+      const res  = await fetch('http://localhost:5000/api/campaigns', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name, domain, duration_days: duration }),
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        PV.toast('Campaign deployed: ' + data.campaign.campaign_id);
+        setTimeout(() => showScreen('campaigns'), 800);
+      } else {
+        PV.toast('Error: ' + (data.message || 'unknown error'));
+      }
+    } catch {
+      PV.toast('Deploy failed — start backend first: python backend/app.py');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Deploy campaign';
+    }
+  });
+
+  // run bar anims initial
+  document.querySelectorAll('.bar-fill[data-w]').forEach(b => {
+    setTimeout(() => { b.style.width = b.dataset.w + '%'; }, 300);
+  });
+
+  // Load real employee data on initial overview screen
+  PV.loadOverviewEmployees();
+</script>
+</body>
+</html>

@@ -48,9 +48,29 @@ class EventDatabase:
         for ev in self._events:
             for tile in ev.trigger_tiles:
                 self._tile_index[tile] = ev
+        # Campaign filter: None = all events active
+        self._enabled: set[str] | None = None
+
+    # ── Campaign filter ──────────────────────────────────────────────────
+
+    def set_enabled_events(self, event_ids: list[str] | set[str]):
+        """
+        Restrict which events are active for this session.
+        Called by the campaign runner before the game loop starts.
+        Pass None to re-enable all events.
+        """
+        self._enabled = set(event_ids) if event_ids is not None else None
+
+    # ── Lookups ────────────────────────────────────────────────────────
 
     def get_by_tile(self, tx: int, ty: int) -> EventDefinition | None:
-        return self._tile_index.get((tx, ty))
+        ev = self._tile_index.get((tx, ty))
+        if ev is None:
+            return None
+        # Honour campaign filter
+        if self._enabled is not None and ev.id not in self._enabled:
+            return None
+        return ev
 
     def get_by_id(self, event_id: str) -> EventDefinition | None:
         for ev in self._events:
@@ -59,8 +79,14 @@ class EventDatabase:
         return None
 
     def all_events(self) -> list[EventDefinition]:
-        return list(self._events)
+        """Returns only campaign-enabled events (or all if no filter is set)."""
+        if self._enabled is None:
+            return list(self._events)
+        return [ev for ev in self._events if ev.id in self._enabled]
 
     @property
     def total(self) -> int:
-        return len(self._events)
+        """Count of active (campaign-filtered) events."""
+        if self._enabled is None:
+            return len(self._events)
+        return sum(1 for ev in self._events if ev.id in self._enabled)

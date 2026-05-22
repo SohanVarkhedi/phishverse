@@ -1,0 +1,13 @@
+{
+  "campaign_id": "finance_campaign",
+  "name": "Finance Protection",
+  "department": "Finance",
+  "description": "High-stakes training for finance staff who authorise payments. Focuses on CEO fraud (Business Email Compromise) and urgency-manipulation emails — the primary attack vectors targeting finance teams worldwide.",
+  "employees": ["emp04", "emp05", "emp06"],
+  "enabled_events": [
+    "ceo_fraud",
+    "email_phishing"
+  ],
+  "pass_score": 85,
+  "duration_days": 14
+}

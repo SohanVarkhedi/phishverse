@@ -1,0 +1,19 @@
+{
+  "employee": "786",
+  "risk": "HIGH",
+  "confidence": 0.95,
+  "weakness": "authority",
+  "recommendation": "Immediate training required: CEO Fraud & HR Impersonation, Vishing & Fear Manipulation.",
+  "generated_topics": [
+    "urgency",
+    "urgency",
+    "authority",
+    "authority",
+    "authority",
+    "reward",
+    "reward",
+    "fear",
+    "fear",
+    "fear"
+  ]
+}

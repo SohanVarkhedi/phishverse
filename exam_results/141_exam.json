@@ -1,0 +1,33 @@
+{
+  "employee_id": "141",
+  "employee_name": "sujal",
+  "department": "HR",
+  "role": "",
+  "campaign": "Finance Protection",
+  "entrance_score": 70,
+  "final_score": 100,
+  "correct": 10,
+  "total_questions": 10,
+  "passed": true,
+  "by_category": {
+    "reward": {
+      "correct": 2,
+      "total": 2
+    },
+    "authority": {
+      "correct": 2,
+      "total": 2
+    },
+    "urgency": {
+      "correct": 4,
+      "total": 4
+    },
+    "fear": {
+      "correct": 2,
+      "total": 2
+    }
+  },
+  "cyber_maturity": "Cyber Guardian",
+  "attempt": 1,
+  "timestamp": "2026-05-22T13:17:39.366923+00:00"
+}

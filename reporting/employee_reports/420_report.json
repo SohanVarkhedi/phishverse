@@ -1,0 +1,57 @@
+{
+  "employee": {
+    "employee_name": "RAHUL ARAG",
+    "employee_id": "420",
+    "department": "Finance",
+    "role": ""
+  },
+  "campaign": "rahul_campaign",
+  "campaign_name": "rahul campaign",
+  "date": "2026-05-22",
+  "score": 80,
+  "pass_score": 85,
+  "passed": false,
+  "risk": "LOW",
+  "biases": {
+    "urgency": 0,
+    "authority": 20,
+    "reward": 0,
+    "fear": 15
+  },
+  "weakness": {
+    "primary": "Authority Phishing",
+    "secondary": "Fear Tactics"
+  },
+  "training_progress": {
+    "events_total": 6,
+    "events_completed": 6,
+    "progress_pct": 100,
+    "completed_events": [
+      "email_phishing",
+      "voice_phishing",
+      "ceo_fraud",
+      "qr_phishing",
+      "usb_drop",
+      "hr_message"
+    ]
+  },
+  "maturity": {
+    "level": "Secure",
+    "description": "You demonstrate solid security instincts.",
+    "score": 80
+  },
+  "lectures": {
+    "assigned": 0,
+    "completed": 0,
+    "pending": 0,
+    "progress_pct": 0,
+    "items": []
+  },
+  "recommendation": {
+    "next_lecture": "Executive Impersonation & BEC",
+    "suggested_topic": "Authority Phishing",
+    "exam_ready": true
+  },
+  "exam_status": "UNLOCKED",
+  "timestamp": "2026-05-22T19:39:34.543779+00:00"
+}

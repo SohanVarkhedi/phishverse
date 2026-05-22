@@ -1,0 +1,33 @@
+{
+  "employee_id": "100",
+  "employee_name": "Sohan",
+  "department": "IT",
+  "role": "",
+  "campaign": "Finance Protection",
+  "entrance_score": 90,
+  "final_score": 90,
+  "correct": 9,
+  "total_questions": 10,
+  "passed": true,
+  "by_category": {
+    "urgency": {
+      "correct": 4,
+      "total": 4
+    },
+    "fear": {
+      "correct": 2,
+      "total": 2
+    },
+    "authority": {
+      "correct": 2,
+      "total": 2
+    },
+    "reward": {
+      "correct": 1,
+      "total": 2
+    }
+  },
+  "cyber_maturity": "Cyber Guardian",
+  "attempt": 1,
+  "timestamp": "2026-05-22T15:56:29.877919+00:00"
+}

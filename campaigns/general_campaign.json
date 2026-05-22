@@ -1,0 +1,17 @@
+{
+  "campaign_id": "general_campaign",
+  "name": "General Security Awareness",
+  "department": "General",
+  "description": "Full-spectrum phishing awareness for all departments. Covers all six attack vectors — email, CEO fraud, vishing, QR, USB, and HR authority spoofing.",
+  "employees": [],
+  "enabled_events": [
+    "email_phishing",
+    "qr_phishing",
+    "usb_drop",
+    "hr_message",
+    "voice_phishing",
+    "ceo_fraud"
+  ],
+  "pass_score": 80,
+  "duration_days": 14
+}

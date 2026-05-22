@@ -1,0 +1,27 @@
+{
+  "employee_name": "Sohan",
+  "employee_id": "100",
+  "department": "IT",
+  "role": "",
+  "campaign": "finance_campaign",
+  "campaign_name": "Finance Protection",
+  "score": 90,
+  "pass_score": 85,
+  "passed": true,
+  "urgency": 10,
+  "authority": 0,
+  "reward": 0,
+  "fear": 0,
+  "risk": "LOW",
+  "weakest_area": "Urgency Attacks",
+  "recommendation": "Excellent awareness! Keep up regular cyber training.",
+  "mistakes": 1,
+  "successful_reports": 1,
+  "completed_events": [
+    "ceo_fraud",
+    "email_phishing"
+  ],
+  "events_total": 2,
+  "events_completed": 2,
+  "timestamp": "2026-05-22T15:55:31.747214+00:00"
+}

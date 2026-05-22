@@ -1,0 +1,18 @@
+{
+  "employee": "2408",
+  "assigned_lectures": [
+    "email_awareness",
+    "ceo_fraud_awareness",
+    "qr_awareness",
+    "vishing_awareness"
+  ],
+  "completed_lectures": [
+    "ceo_fraud_awareness",
+    "qr_awareness",
+    "vishing_awareness",
+    "email_awareness"
+  ],
+  "completed": true,
+  "assigned_at": "2026-05-22T16:20:29.163691+00:00",
+  "completed_at": "2026-05-22T16:20:44.608342+00:00"
+}

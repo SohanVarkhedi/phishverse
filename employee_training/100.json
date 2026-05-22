@@ -1,0 +1,16 @@
+{
+  "employee": "100",
+  "assigned_lectures": [
+    "email_awareness",
+    "ceo_fraud_awareness",
+    "vishing_awareness"
+  ],
+  "completed_lectures": [
+    "email_awareness",
+    "ceo_fraud_awareness",
+    "vishing_awareness"
+  ],
+  "completed": true,
+  "assigned_at": "2026-05-22T11:14:50.810790+00:00",
+  "completed_at": "2026-05-22T11:15:15.308244+00:00"
+}

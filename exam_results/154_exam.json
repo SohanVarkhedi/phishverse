@@ -1,0 +1,33 @@
+{
+  "employee_id": "154",
+  "employee_name": "ZECH",
+  "department": "IT",
+  "role": "",
+  "campaign": "Finance Protection",
+  "entrance_score": 70,
+  "final_score": 90,
+  "correct": 9,
+  "total_questions": 10,
+  "passed": true,
+  "by_category": {
+    "urgency": {
+      "correct": 3,
+      "total": 4
+    },
+    "authority": {
+      "correct": 2,
+      "total": 2
+    },
+    "reward": {
+      "correct": 2,
+      "total": 2
+    },
+    "fear": {
+      "correct": 2,
+      "total": 2
+    }
+  },
+  "cyber_maturity": "Cyber Guardian",
+  "attempt": 1,
+  "timestamp": "2026-05-22T14:36:43.745601+00:00"
+}

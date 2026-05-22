@@ -43,11 +43,18 @@ DIALOG_TEXT   = (240, 240, 255)
 CHOICE_HL     = (45,  95, 210)
 
 # ── Game states ───────────────────────────────────────────────────────────────
-STATE_TITLE   = "title"
-STATE_EXPLORE = "explore"
-STATE_DIALOG  = "dialog"
-STATE_MENU    = "menu"
-STATE_REPORT  = "report"
+STATE_TITLE           = "title"
+STATE_REGISTRATION    = "registration"      # new: employee info form
+STATE_CAMPAIGN_SELECT = "campaign_select"
+STATE_EXPLORE         = "explore"
+STATE_DIALOG          = "dialog"
+STATE_MENU            = "menu"
+STATE_REPORT          = "report"
+STATE_SEMESTER_REPORT = "semester_report"   # Phase 8: comprehensive report card
+STATE_FINAL_EXAM      = "final_exam"         # Phase 9: adaptive MCQ exam
+STATE_CERTIFICATE     = "certificate"        # Phase 9: pass certificate display
+STATE_LECTURES        = "lectures"
+STATE_DASHBOARD       = "dashboard"
 
 EVENT_FILE    = "data/events.json"
 MAX_SCORE     = 100

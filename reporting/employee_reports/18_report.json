@@ -1,0 +1,53 @@
+{
+  "employee": {
+    "employee_name": "VIRAT KOHLI",
+    "employee_id": "18",
+    "department": "HR",
+    "role": ""
+  },
+  "campaign": "q2_reception_calm_refuse",
+  "campaign_name": "Q2 Reception · Calm Refuse",
+  "date": "2026-05-22",
+  "score": 85,
+  "pass_score": 85,
+  "passed": true,
+  "risk": "LOW",
+  "biases": {
+    "urgency": 0,
+    "authority": 15,
+    "reward": 0,
+    "fear": 10
+  },
+  "weakness": {
+    "primary": "Authority Phishing",
+    "secondary": "Fear Tactics"
+  },
+  "training_progress": {
+    "events_total": 2,
+    "events_completed": 2,
+    "progress_pct": 100,
+    "completed_events": [
+      "hr_message",
+      "voice_phishing"
+    ]
+  },
+  "maturity": {
+    "level": "Cyber Guardian",
+    "description": "You are a cybersecurity champion.",
+    "score": 85
+  },
+  "lectures": {
+    "assigned": 0,
+    "completed": 0,
+    "pending": 0,
+    "progress_pct": 0,
+    "items": []
+  },
+  "recommendation": {
+    "next_lecture": "Executive Impersonation & BEC",
+    "suggested_topic": "Authority Phishing",
+    "exam_ready": true
+  },
+  "exam_status": "UNLOCKED",
+  "timestamp": "2026-05-22T19:15:34.102384+00:00"
+}

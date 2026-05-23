@@ -1,0 +1,13 @@
+{
+  "campaign_id": "sohan_campaign",
+  "name": "SOHAN CAMPAIGN",
+  "department": "Finance",
+  "description": "Finance security training \u2014 SOHAN CAMPAIGN",
+  "employees": [],
+  "enabled_events": [
+    "ceo_fraud",
+    "email_phishing"
+  ],
+  "pass_score": 85,
+  "duration_days": 1
+}

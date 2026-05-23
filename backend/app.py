@@ -124,6 +124,9 @@ def list_employees():
         try:
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
+            # Skip behaviour sub-files (e.g. *_behavior.json)
+            if path.stem.endswith("_behavior"):
+                continue
             employees.append({
                 "employee_id":   data.get("employee_id", path.stem),
                 "employee_name": data.get("employee_name", ""),
@@ -140,6 +143,13 @@ def list_employees():
                 "authority":     data.get("authority", 0),
                 "reward":        data.get("reward", 0),
                 "fear":          data.get("fear", 0),
+                # Behaviour metrics (Phase 10)
+                "clicked_link":      data.get("clicked_link",      0),
+                "credential_submit": data.get("credential_submit",  0),
+                "reported_attack":   data.get("reported_attack",    0),
+                "ignored_attack":    data.get("ignored_attack",     0),
+                "click_rate":        data.get("click_rate",         0.0),
+                "report_rate":       data.get("report_rate",        0.0),
             })
         except Exception:
             pass
@@ -208,6 +218,59 @@ def create_campaign():
 
     print(f"[PHISHVERSE] Campaign saved -> {out_path}")
     return jsonify({"status": "ok", "campaign": campaign})
+
+
+# ─────────────────────────────────────────
+# GET /api/dept-stats
+# Aggregates behaviour + risk by department across all employees
+# ─────────────────────────────────────────
+@app.route("/api/dept-stats", methods=["GET"])
+def dept_stats():
+    dept_map: dict[str, list[dict]] = {}
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    for path in sorted(RESULTS_DIR.glob("*.json")):
+        if path.stem.endswith("_behavior"):
+            continue
+        try:
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+            dept = data.get("department", "Unknown") or "Unknown"
+            dept_map.setdefault(dept, []).append(data)
+        except Exception:
+            pass
+
+    stats = []
+    for dept, records in dept_map.items():
+        n = len(records)
+        def avg(key, default=0):
+            return round(sum(r.get(key, default) for r in records) / n, 2)
+
+        click_rates  = [r.get("click_rate", 0.0)  for r in records]
+        report_rates = [r.get("report_rate", 0.0) for r in records]
+        risks = [r.get("risk", "UNKNOWN") for r in records]
+        high_count = risks.count("HIGH")
+
+        stats.append({
+            "department":          dept,
+            "total_employees":     n,
+            "avg_score":           avg("score"),
+            "avg_click_rate":      round(sum(click_rates) / n, 2),
+            "avg_report_rate":     round(sum(report_rates) / n, 2),
+            "avg_credential_submit": avg("credential_submit"),
+            "high_risk_count":     high_count,
+            "high_risk_pct":       round(high_count / n * 100, 1),
+            "pass_rate_pct":       round(sum(1 for r in records if r.get("passed")) / n * 100, 1),
+        })
+
+    # Sort by avg_click_rate desc (most vulnerable first)
+    stats.sort(key=lambda x: x["avg_click_rate"], reverse=True)
+    most_vulnerable = stats[0]["department"] if stats else "N/A"
+
+    return jsonify({
+        "status":          "ok",
+        "departments":     stats,
+        "most_vulnerable": most_vulnerable,
+    })
 
 
 # ─────────────────────────────────────────

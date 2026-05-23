@@ -314,6 +314,31 @@ Registration -> Campaign Select -> Entrance Exam -> Cyber Resilience Report -> S
 - [x] `PV._screenHandlers` / `PV.onScreenShow` hook — screens auto-load data when navigated to
 - [x] `general_campaign.json` created for General domain (all 6 events)
 
+### Phase 11 — Campaigns Page: Real Data (2026-05-23)
+
+- [x] admin.html — removed all hardcoded mock campaign cards (Treasury Cohort, Reception Voice Drills, Marketing Brand Spoof, USB Drop, HR Bonus Wave)
+- [x] admin.html — campaigns section now uses `id="campaignsGrid"` container + dynamic `id="campaignsStat"` tag
+- [x] admin.html — `showScreen()` now fires `PV._screenHandlers` (campaigns reload on deploy redirect)
+- [x] app.js — `PV.loadCampaigns()` added: fetches `GET /api/campaigns`, renders real cards, empty state
+- [x] app.js — `PV.onScreenShow('campaigns', PV.loadCampaigns)` registered
+- [x] WEB_INTEGRATION.md — updated to remove mock dependency notes for campaigns
+
 ### NEXT
 - Phase 12: Annual renewal, expiry tracking
 - Phase 13: Multi-employee session (manager assigns campaign link per employee)
+
+### Phase 10 — ML Risk Engine + Behaviour Analytics (2026-05-23)
+
+- [x] analytics/behaviour_tracker.py — tracks clicked_link, credential_submit, reported_attack, ignored_attack per session
+- [x] ai/risk_model.py — DecisionTreeClassifier with train/predict/fallback
+- [x] ai/datasets/risk_dataset.csv — 255 synthetic labelled rows
+- [x] ai/ai_models/ — model artifact directory
+- [x] event_manager.py — BehaviourTracker hooked to _handle_choice()
+- [x] main.py — BehaviourTracker instantiated, wired, passed to _end_game
+- [x] analytics/result_store.py — 8 behaviour fields in result JSON
+- [x] ai/__init__.py — RiskModel replaces RiskPredictor; behaviour passed to prediction
+- [x] backend/app.py — /api/employees includes behaviour metrics; /api/dept-stats added
+- [x] employee.html — ML Risk Prediction card + Behaviour Metrics card
+- [x] admin.html — Click Rate / Report Rate columns in employee table; Dept Vulnerability table in heatmap
+- [x] app.js — loadEmployees updated; loadDeptStats added; heatmap screen registered
+- [x] ML_ARCHITECTURE.md created

@@ -1,0 +1,13 @@
+{
+  "campaign_id": "microsoft_campaign",
+  "name": "MICROSOFT CAMPAIGN",
+  "department": "HR",
+  "description": "HR security training \u2014 MICROSOFT CAMPAIGN",
+  "employees": [],
+  "enabled_events": [
+    "hr_message",
+    "voice_phishing"
+  ],
+  "pass_score": 85,
+  "duration_days": 1
+}

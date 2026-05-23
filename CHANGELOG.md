@@ -1,3 +1,31 @@
+
+## [Phase 10] — 2026-05-23 — ML Risk Engine + Behaviour Analytics
+
+### Added
+- analytics/behaviour_tracker.py — BehaviourTracker class (clicked_link, credential_submit, reported_attack, ignored_attack, click_rate, report_rate, attack_history)
+- ai/risk_model.py — DecisionTreeClassifier (sklearn); train_model(), predict(), rule fallback
+- ai/datasets/risk_dataset.csv — 255-row synthetic training dataset
+- ai/ai_models/ — artifact directory for trained .pkl
+- ML_ARCHITECTURE.md — full ML design doc
+- backend/app.py — GET /api/dept-stats endpoint
+- employee.html — ML Risk Prediction card, Behaviour Metrics card with progress bars
+- admin.html — Department Vulnerability real-data table (#deptStatsBody); Click Rate + Report Rate columns in employee table
+
+### Changed
+- event_manager.py — EventManager.set_behaviour_tracker(); _handle_choice() calls tracker.record()
+- main.py — BehaviourTracker instantiated; wired to EventManager; passed to ResultStore.save() and run_ai_analysis()
+- analytics/result_store.py — ResultStore.save() now accepts behaviour: dict; 8 behaviour fields written to JSON
+- ai/__init__.py — uses RiskModel (ML Decision Tree) instead of RiskPredictor; behaviour dict merged into features; ai JSON includes ml_source + behaviour summary
+- backend/app.py — /api/employees now includes click_rate, report_rate, clicked_link, credential_submit, reported_attack, ignored_attack
+- app.js — PV.loadEmployees() updated for 8 columns with coloured click/report rate cells; PV.loadDeptStats() added; heatmap screen wired via PV.onScreenShow
+
+### Architecture
+- Rule engine (RiskEngine) remains source of truth for game score and pass/fail
+- ML model augments: predicts risk label with confidence, identifies weakness
+- BehaviourTracker classifies each event choice into link-click / credential-submit / report / vishing-fall
+
+---
+
 # PHISHVERSE — Changelog
 
 All notable changes to this project are documented here.

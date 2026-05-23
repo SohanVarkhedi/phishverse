@@ -55,7 +55,7 @@ Single-page dashboard. One sidebar, N screens hidden/shown via `PV.showAdminPage
 |---------|--------|-------------|
 | `screen-overview` | KPI grid + campaign chart + threat feed | `PV.MOCK.*` |
 | `screen-employees` | Employee roster table | `analytics/results/` |
-| `screen-campaigns` | Campaign list + analytics | `campaigns/` |
+| `screen-campaigns` | Campaign list (dynamic, real data) | `GET /api/campaigns` → `campaigns/` |
 | `screen-heatmap` | Department risk heatmap | `risk_engine.py` aggregated |
 | `screen-reports` | AI report cards | `ai_results/` |
 | `screen-mcq` | MCQ results + pass/fail | `exam/` |
@@ -110,8 +110,9 @@ Single JS file loaded by all pages. Exposes everything on `window.PV`.
 | `PV.getProgress()` | Return current step completion state |
 | `PV.renderBiasBar(el, data)` | Render 4-axis bias bar visualization into a container |
 | `PV.renderRing(el, pct, label)` | Render an SVG score ring |
+| `PV.loadCampaigns()` | Load real campaigns from `GET /api/campaigns`; render into `#campaignsGrid`; empty state with add-card |
 | `PV.renderHeatmap(el)` | Render department risk bars from mock data |
-| `PV.MOCK` | Mock analytics dataset (departments, employees, bias, AI summary) |
+| `PV.MOCK` | Mock analytics dataset (departments, bias) — campaigns and employees are now fully real |
 | `PV.openModal(id)` | Open a modal by ID |
 | `PV.closeModal(id)` | Close a modal |
 | `PV.toast(msg)` | Show a bottom-right toast notification |

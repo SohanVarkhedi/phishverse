@@ -12,19 +12,24 @@ from constants   import *
 
 class EventManager:
     def __init__(self, db: EventDatabase, dialog: DialogBox, risk: RiskEngine):
-        self.db     = db
-        self.dialog = dialog
-        self.risk   = risk
+        self.db       = db
+        self.dialog   = dialog
+        self.risk     = risk
         self._seen: set[str] = set()
         self._active: EventDefinition | None = None
         self._on_game_end  = None
         self._on_score_chg = None   # callback(delta: int, good: bool)
+        self._behaviour    = None   # BehaviourTracker (optional, set via set_behaviour_tracker)
 
     def set_game_end_callback(self, cb):
         self._on_game_end = cb
 
     def set_score_callback(self, cb):
         self._on_score_chg = cb
+
+    def set_behaviour_tracker(self, tracker):
+        """Attach a BehaviourTracker; called once by Game.__init__."""
+        self._behaviour = tracker
 
     # ── Triggers ─────────────────────────────────────────────────────────────
 
@@ -77,6 +82,10 @@ class EventManager:
             msg = penalty.get("message", "That was risky.")
             outcome_lines = msg.split("\n")
             outcome_title = "⚠ PHISHING DETECTED"
+
+        # Record behaviour signal before marking event seen
+        if self._behaviour is not None:
+            self._behaviour.record(ev.id, ev.trigger_type, choice, is_correct)
 
         self._seen.add(ev.id)
         is_final = ev.is_final

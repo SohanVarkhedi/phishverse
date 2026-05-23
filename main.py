@@ -21,8 +21,9 @@ from ai import run_ai_analysis
 from report         import CyberResilienceReport
 from tiles          import TILE_DOOR
 from story          import StoryManager
-from analytics.result_store  import ResultStore
+from analytics.result_store    import ResultStore
 from analytics.campaign_loader import CampaignLoader
+from analytics.behaviour_tracker import BehaviourTracker
 
 # Objectives are now managed by StoryManager (story.py).
 # This list is kept as a short fallback used only before StoryManager initialises.
@@ -102,8 +103,9 @@ class Game:
         self.player = Player(*self.START_TILE)
         self.npcs   = build_npcs()
 
-        self.risk   = RiskEngine()
-        self.db     = EventDatabase()
+        self.risk      = RiskEngine()
+        self.behaviour = BehaviourTracker()
+        self.db        = EventDatabase()
 
         # Apply campaign event filter if a campaign is active
         if self._campaign is not None:
@@ -115,6 +117,7 @@ class Game:
         self.ev_mgr = EventManager(self.db, self.dialog, self.risk)
         self.ev_mgr.set_game_end_callback(self._end_game)
         self.ev_mgr.set_score_callback(self._on_score)
+        self.ev_mgr.set_behaviour_tracker(self.behaviour)
 
         # Story progression
         self.story  = StoryManager()
@@ -233,21 +236,25 @@ class Game:
             SemesterReport.save(semester, emp["employee_id"])
         self._semester_report = semester   # store for exam routing
         self._exam_attempt    = 1          # reset on new game
-        # Persist campaign result
+        # Persist campaign result (includes behaviour metrics)
         if self._campaign is not None:
             ResultStore.save(
                 employee=emp,
                 campaign=self._campaign,
                 risk_summary=self.risk.summary_dict(),
                 completed_events=list(self.ev_mgr._seen),
+                behaviour=self.behaviour.to_dict(),
             )
-        # Assign lectures based on risk profile then load them into the screen
+        # Persist granular behaviour JSON
         emp_id = emp.get("employee_id")
+        if emp_id:
+            self.behaviour.save(emp_id)
+        # Assign lectures based on risk profile then load them into the screen
         LectureEngine.assign_lectures(emp_id, self.risk.summary_dict())
         self.lecture_screen.set_employee(emp_id)
-        # AI analysis — runs after rule-based systems; augments, does not replace
+        # AI analysis — augments rule engine with ML prediction
         if emp_id:
-            run_ai_analysis(emp_id, self.risk.summary_dict())
+            run_ai_analysis(emp_id, self.risk.summary_dict(), behaviour=self.behaviour.to_dict())
 
     def _apply_campaign(self, campaign):
         """Apply a campaign chosen from the campaign select screen."""

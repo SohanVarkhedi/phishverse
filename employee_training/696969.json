@@ -1,0 +1,13 @@
+{
+  "employee": "696969",
+  "assigned_lectures": [
+    "email_awareness",
+    "ceo_fraud_awareness",
+    "qr_awareness",
+    "vishing_awareness"
+  ],
+  "completed_lectures": [],
+  "completed": false,
+  "assigned_at": "2026-05-23T02:53:41.463320+00:00",
+  "completed_at": null
+}

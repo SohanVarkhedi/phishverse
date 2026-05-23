@@ -549,10 +549,11 @@
               <th style="padding-left:28px;">Employee</th>
               <th>Department</th>
               <th>Bias Profile</th>
-              <th>Progress</th>
+              <th>Click Rate</th>
+              <th>Report Rate</th>
               <th>Score</th>
-              <th>Stage</th>
-              <th style="padding-right:28px;"></th>
+              <th>Risk</th>
+              <th style="padding-right:28px;">Status</th>
             </tr>
           </thead>
           <tbody id="empBody"></tbody>
@@ -564,7 +565,7 @@
     <section class="screen" id="screen-campaigns">
       <div class="page-head">
         <div>
-          <span class="tag gold">3 LIVE · 2 SCHEDULED</span>
+          <span class="tag gold" id="campaignsStat">LOADING…</span>
           <h1 style="margin-top:14px;">Campaigns</h1>
           <p class="lede">AI-authored attack simulations scoped per department, attack type, and difficulty.</p>
         </div>
@@ -576,82 +577,8 @@
         </div>
       </div>
 
-      <div class="grid-three">
-        <article class="card glow-card" style="cursor:none;">
-          <div class="card-head"><div><h3>Q2 Treasury Cohort</h3><span class="sub">Industry · Banking</span></div><span class="tag cyan">RUNNING</span></div>
-          <div style="margin-bottom: 18px;"><span class="tag muted">CEO&nbsp;Fraud</span> <span class="tag muted">Vishing</span> <span class="tag muted">Quishing</span></div>
-          <div style="display:flex; flex-direction:column; gap:14px;">
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Engaged</span><span class="mono" style="color:var(--cyan);">68 / 84</span></div>
-              <div class="bar"><div class="bar-fill" data-w="81"></div></div>
-            </div>
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Click rate</span><span class="mono" style="color:var(--red);">23%</span></div>
-              <div class="bar"><div class="bar-fill red" data-w="23"></div></div>
-            </div>
-          </div>
-          <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:0.1em;">DAY 7 / 14</div>
-        </article>
-
-        <article class="card glow-card">
-          <div class="card-head"><div><h3>Reception · Voice Drills</h3><span class="sub">Industry · Hospitality</span></div><span class="tag red">CRITICAL</span></div>
-          <div style="margin-bottom: 18px;"><span class="tag muted">Vishing</span> <span class="tag muted">HR&nbsp;Authority</span></div>
-          <div style="display:flex; flex-direction:column; gap:14px;">
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Engaged</span><span class="mono" style="color:var(--cyan);">18 / 18</span></div>
-              <div class="bar"><div class="bar-fill" data-w="100"></div></div>
-            </div>
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Click rate</span><span class="mono" style="color:var(--red);">78%</span></div>
-              <div class="bar"><div class="bar-fill red" data-w="78"></div></div>
-            </div>
-          </div>
-          <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:0.1em;">DAY 11 / 14</div>
-        </article>
-
-        <article class="card glow-card">
-          <div class="card-head"><div><h3>Marketing · Brand Spoof</h3><span class="sub">Industry · SaaS</span></div><span class="tag gold">RUNNING</span></div>
-          <div style="margin-bottom: 18px;"><span class="tag muted">Email</span> <span class="tag muted">QR&nbsp;Phishing</span></div>
-          <div style="display:flex; flex-direction:column; gap:14px;">
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Engaged</span><span class="mono" style="color:var(--cyan);">22 / 28</span></div>
-              <div class="bar"><div class="bar-fill gold" data-w="78"></div></div>
-            </div>
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span>Click rate</span><span class="mono" style="color:var(--gold);">42%</span></div>
-              <div class="bar"><div class="bar-fill gold" data-w="42"></div></div>
-            </div>
-          </div>
-          <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:0.1em;">DAY 4 / 10</div>
-        </article>
-
-        <article class="card" style="border-style:dashed; cursor:none;" onclick="showScreen('new')">
-          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; padding:24px;">
-            <div style="width:48px; height:48px; border-radius:50%; border:1px solid var(--line-strong); display:grid; place-items:center; color:var(--cyan); margin-bottom:14px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 5v14M5 12h14"/></svg>
-            </div>
-            <h3 style="font-size:16px; font-family:var(--font-body); font-weight:500;">Author a new campaign</h3>
-            <p style="font-size:13px; color:var(--muted); margin-top:6px;">AI-generated · industry-aware · ready in 90 seconds.</p>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-head"><div><h3>Eng · USB Drop</h3><span class="sub">Industry · Software</span></div><span class="tag purple">SCHEDULED</span></div>
-          <p style="font-size:13px; color:var(--muted); margin: 8px 0 18px;">Physical "lost" branded drives placed in HQ common areas. Telemetry via HID detection.</p>
-          <div style="display:flex; justify-content:space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.12em;">
-            <span>STARTS · 02 JUN</span>
-            <span>66 SEATS</span>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-head"><div><h3>HR · Bonus Wave</h3><span class="sub">Industry · Cross-functional</span></div><span class="tag purple">SCHEDULED</span></div>
-          <p style="font-size:13px; color:var(--muted); margin: 8px 0 18px;">Authority + reward trigger pairing — fake payroll/bonus letters timed to review windows.</p>
-          <div style="display:flex; justify-content:space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.12em;">
-            <span>STARTS · 09 JUN</span>
-            <span>214 SEATS</span>
-          </div>
-        </article>
+      <div id="campaignsGrid" class="grid-three">
+        <!-- populated by PV.loadCampaigns() -->
       </div>
     </section>
 
@@ -689,6 +616,24 @@
           <span><span style="display:inline-block; width:10px; height:10px; background:var(--gold); border-radius:3px; margin-right:6px; vertical-align:middle;"></span>ELEVATED 66&ndash;79</span>
           <span><span style="display:inline-block; width:10px; height:10px; background:var(--red); border-radius:3px; margin-right:6px; vertical-align:middle;"></span>CRITICAL 80+</span>
         </div>
+      </div>
+
+      <!-- Real dept stats from Phase 10 ML engine -->
+      <div class="card" style="margin-top:20px; padding:0; overflow:hidden;">
+        <div class="card-head" style="padding:20px 24px;"><div><h3>Department Vulnerability · Real Data</h3><span class="sub">Click rate · Report rate · High-risk count · from gameplay telemetry</span></div><span class="tag red" id="mostVulnerable">—</span></div>
+        <table class="data-table" style="width:100%;">
+          <thead><tr>
+            <th style="padding-left:24px;">Department</th>
+            <th>Employees</th>
+            <th>Avg Score</th>
+            <th>Click Rate</th>
+            <th>Report Rate</th>
+            <th style="padding-right:24px;">High Risk</th>
+          </tr></thead>
+          <tbody id="deptStatsBody">
+            <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">LOADING…</td></tr>
+          </tbody>
+        </table>
       </div>
 
       <div class="grid-two" style="margin-top: 20px;">
@@ -1072,6 +1017,9 @@
     document.getElementById('crumbCur').textContent = labels[name] || name;
     document.querySelector('.sidebar')?.classList.remove('open');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    // fire registered data-load handler
+    const handler = PV._screenHandlers[name];
+    if (handler) handler();
     // re-animate bars
     const active = document.querySelector('.screen.show');
     if (active) {
@@ -1103,9 +1051,11 @@
   window.addEventListener('hashchange', routeFromHash);
   routeFromHash();
 
-  // ─── Register real employee loaders ───
+  // ─── Register real data loaders ───
   PV.onScreenShow('employees', PV.loadEmployees);
   PV.onScreenShow('overview',  PV.loadOverviewEmployees);
+  PV.onScreenShow('heatmap',   PV.loadDeptStats);
+  PV.onScreenShow('campaigns', PV.loadCampaigns);
 
   // ─── MCQ breakdown ───
   const qData = [
@@ -1204,8 +1154,9 @@
     setTimeout(() => { b.style.width = b.dataset.w + '%'; }, 300);
   });
 
-  // Load real employee data on initial overview screen
+  // Load data for initial screen
   PV.loadOverviewEmployees();
+  PV.loadCampaigns();
 </script>
 </body>
 </html>

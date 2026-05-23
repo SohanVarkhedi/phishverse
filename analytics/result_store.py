@@ -37,6 +37,7 @@ class ResultStore:
         campaign,                    # Campaign object from campaign_loader
         risk_summary: dict,
         completed_events: list[str],
+        behaviour: dict | None = None,   # from BehaviourTracker.to_dict()
     ) -> Path:
         """
         Persist a simulation result to disk.
@@ -84,6 +85,16 @@ class ResultStore:
             "completed_events": completed_events,
             "events_total":     len(campaign.enabled_events),
             "events_completed": len(completed_events),
+
+            # ── Behaviour metrics ─────────────────────────────────────────
+            "clicked_link":      (behaviour or {}).get("clicked_link",      0),
+            "credential_submit": (behaviour or {}).get("credential_submit",  0),
+            "reported_attack":   (behaviour or {}).get("reported_attack",    0),
+            "ignored_attack":    (behaviour or {}).get("ignored_attack",     0),
+            "correct_actions":   (behaviour or {}).get("correct_actions",    0),
+            "wrong_actions":     (behaviour or {}).get("wrong_actions",      0),
+            "click_rate":        (behaviour or {}).get("click_rate",         0.0),
+            "report_rate":       (behaviour or {}).get("report_rate",        0.0),
 
             # ── Meta ──────────────────────────────────────────────────────
             "timestamp":      timestamp,

@@ -796,6 +796,62 @@
         </div>
       </div>
 
+      <!-- ML Risk Prediction -->
+      <div class="card" style="margin-top:18px; border:1px solid rgba(0,212,255,0.18);">
+        <div class="card-head">
+          <div><h3>ML Risk Prediction</h3><span class="sub">Decision Tree · augments rule engine</span></div>
+          <span class="tag cyan" id="mlRiskTag">—</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:14px;">
+          <div>
+            <div class="mono" style="font-size:11px; color:var(--muted); letter-spacing:.12em; margin-bottom:4px;">PREDICTED RISK</div>
+            <div class="mono" id="mlRisk" style="font-size:20px; font-weight:700; color:var(--cyan);">—</div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:11px; color:var(--muted); letter-spacing:.12em; margin-bottom:4px;">CONFIDENCE</div>
+            <div class="mono" id="mlConf" style="font-size:20px; font-weight:700; color:var(--gold);">—</div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:11px; color:var(--muted); letter-spacing:.12em; margin-bottom:4px;">WEAKNESS</div>
+            <div class="mono" id="mlWeak" style="font-size:20px; font-weight:700; color:#a855f7;">—</div>
+          </div>
+        </div>
+        <div class="mono" id="mlSource" style="font-size:10px; color:var(--muted); margin-top:10px; letter-spacing:.08em;">Source: —</div>
+      </div>
+
+      <!-- Behaviour Metrics -->
+      <div class="card" style="margin-top:18px;">
+        <div class="card-head"><div><h3>Behaviour Metrics</h3><span class="sub">Actions recorded during gameplay</span></div><span class="tag gold">TELEMETRY</span></div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap:14px; margin-top:14px;">
+          <div>
+            <div class="mono" style="font-size:10px; color:var(--muted); letter-spacing:.12em; margin-bottom:6px;">LINK CLICKS</div>
+            <div class="mono" id="bhvClickLink" style="font-size:22px; color:#ef4444; font-weight:700;">—</div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:10px; color:var(--muted); letter-spacing:.12em; margin-bottom:6px;">CRED SUBMITS</div>
+            <div class="mono" id="bhvCredSub" style="font-size:22px; color:#f97316; font-weight:700;">—</div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:10px; color:var(--muted); letter-spacing:.12em; margin-bottom:6px;">REPORTED</div>
+            <div class="mono" id="bhvReported" style="font-size:22px; color:#22c55e; font-weight:700;">—</div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:10px; color:var(--muted); letter-spacing:.12em; margin-bottom:6px;">CLICK RATE</div>
+            <div class="mono" id="bhvClickRate" style="font-size:22px; color:#ef4444; font-weight:700;">—</div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:10px; color:var(--muted); letter-spacing:.12em; margin-bottom:6px;">REPORT RATE</div>
+            <div class="mono" id="bhvReportRate" style="font-size:22px; color:#22c55e; font-weight:700;">—</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;">
+          <div class="mono" style="font-size:10px; color:var(--muted); letter-spacing:.12em; margin-bottom:6px;">CLICK RATE</div>
+          <div class="bar"><div class="bar-fill" id="bhvClickBar" style="width:0%; background:linear-gradient(90deg,#ef4444,#f97316);"></div></div>
+          <div class="mono" style="font-size:10px; color:var(--muted); letter-spacing:.12em; margin:8px 0 6px;">REPORT RATE</div>
+          <div class="bar"><div class="bar-fill" id="bhvReportBar" style="width:0%; background:linear-gradient(90deg,var(--cyan),#22c55e);"></div></div>
+        </div>
+      </div>
+
       <div class="card" style="margin-top:18px; background: radial-gradient(circle at 100% 0%, rgba(168,85,247,0.10), transparent 60%), linear-gradient(180deg, rgba(11,16,32,0.7), rgba(3,5,12,0.5));">
         <div class="card-head"><div><h3>AI Debrief</h3><span class="sub">Auto-written · Reviewed by PHISHVERSE engine</span></div><span class="tag purple">GPT&nbsp;ENGINE</span></div>
         <p class="mono" id="aiDebriefText" style="font-size:13px; line-height:1.9; color: #C7D0E8; letter-spacing:0.02em;">
@@ -1057,6 +1113,21 @@
     if (sidebar_role) sidebar_role.textContent  = (data.department || 'Trainee');
     if (sidebar_av)   sidebar_av.textContent    = sn.split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
 
+    // Behaviour metrics (Phase 10)
+    const _bhv = (k, id, fmt) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = fmt ? fmt(data[k]) : (data[k] ?? '—');
+    };
+    _bhv('clicked_link',      'bhvClickLink',   null);
+    _bhv('credential_submit', 'bhvCredSub',     null);
+    _bhv('reported_attack',   'bhvReported',    null);
+    _bhv('click_rate',        'bhvClickRate',   v => (v != null ? Math.round(v * 100) + '%' : '—'));
+    _bhv('report_rate',       'bhvReportRate',  v => (v != null ? Math.round(v * 100) + '%' : '—'));
+    const clickBar  = document.getElementById('bhvClickBar');
+    const reportBar = document.getElementById('bhvReportBar');
+    if (clickBar)  clickBar.style.width  = Math.round((data.click_rate  || 0) * 100) + '%';
+    if (reportBar) reportBar.style.width = Math.round((data.report_rate || 0) * 100) + '%';
+
     // Update registration screen
     const rn = document.getElementById('regName');
     const rd = document.getElementById('regDept');
@@ -1066,18 +1137,48 @@
     if (ri) ri.textContent = data.employee_id   || '—';
   }
 
+  function _populateAI(ai) {
+    // ML risk prediction card
+    const riskColour = {HIGH:'#ef4444', MEDIUM:'#f97316', LOW:'#22c55e'};
+    const risk = (ai.risk || '—').toUpperCase();
+    const mlRisk = document.getElementById('mlRisk');
+    const mlTag  = document.getElementById('mlRiskTag');
+    if (mlRisk) { mlRisk.textContent = risk; mlRisk.style.color = riskColour[risk] || 'var(--cyan)'; }
+    if (mlTag)  { mlTag.textContent  = risk; mlTag.style.color  = riskColour[risk] || 'var(--cyan)'; }
+    const mlConf = document.getElementById('mlConf');
+    if (mlConf) mlConf.textContent = ai.confidence != null ? Math.round(ai.confidence * 100) + '%' : '—';
+    const mlWeak = document.getElementById('mlWeak');
+    if (mlWeak) mlWeak.textContent = ai.weakness || '—';
+    const mlSrc = document.getElementById('mlSource');
+    if (mlSrc) mlSrc.textContent = 'Source: ' + (ai.ml_source || ai.source || 'rule_fallback');
+
+    // Behaviour from AI result (backup if not in result JSON)
+    const bhv = ai.behaviour || {};
+    if (bhv.click_rate != null) {
+      const clickBar  = document.getElementById('bhvClickBar');
+      const reportBar = document.getElementById('bhvReportBar');
+      if (clickBar)  clickBar.style.width  = Math.round(bhv.click_rate  * 100) + '%';
+      if (reportBar) reportBar.style.width = Math.round((bhv.report_rate || 0) * 100) + '%';
+    }
+  }
+
   document.getElementById('loadResultsBtn')?.addEventListener('click', async () => {
     const empId = document.getElementById('resultIdInput')?.value?.trim();
     const msg   = document.getElementById('resultLoadMsg');
     if (!empId) { if (msg) msg.textContent = 'Enter an Employee ID first.'; return; }
     if (msg) msg.textContent = 'LOADING…';
     try {
-      const res  = await fetch(`http://localhost:5000/api/results/${encodeURIComponent(empId)}`);
-      const json = await res.json();
-      if (json.status === 'ok') {
-        _populateReport(json.data);
-        if (msg) msg.textContent = `✓ Results loaded for ${json.data.employee_name || empId}`;
-        PV.toast(`Results loaded for ${json.data.employee_name || empId}`);
+      const [resR, resA] = await Promise.allSettled([
+        fetch(`http://localhost:5000/api/results/${encodeURIComponent(empId)}`).then(r => r.json()),
+        fetch(`http://localhost:5000/api/ai-results/${encodeURIComponent(empId)}`).then(r => r.json()),
+      ]);
+      const result = resR.status === 'fulfilled' ? resR.value : null;
+      const aiRes  = resA.status === 'fulfilled' ? resA.value : null;
+      if (result?.status === 'ok') {
+        _populateReport(result.data);
+        if (aiRes?.status === 'ok') _populateAI(aiRes.data);
+        if (msg) msg.textContent = `✓ Results loaded for ${result.data.employee_name || empId}`;
+        PV.toast(`Results loaded for ${result.data.employee_name || empId}`);
       } else {
         if (msg) msg.textContent = `No results found for "${empId}" — complete the game first.`;
       }

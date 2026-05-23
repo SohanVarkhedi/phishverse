@@ -1,5 +1,14 @@
 # PHISHVERSE — Product Roadmap
 
+
+### ✅ Phase 10 — ML Risk Engine + Behaviour Analytics (DONE 2026-05-23)
+- BehaviourTracker + DecisionTree risk model
+- click_rate / report_rate / credential_submit per employee
+- /api/dept-stats — department vulnerability aggregation
+- Employee portal: ML Risk card + Behaviour Metrics card
+- Manager portal: click rate / report rate columns + dept vulnerability table
+
+
 > This document tracks the full product vision from RPG prototype to
 > enterprise cybersecurity training platform.
 

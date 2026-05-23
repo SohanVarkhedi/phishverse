@@ -1314,3 +1314,62 @@ web portals read live JSON via Flask.
 **Next Steps:**
 - Phase 12: Multi-employee sessions (campaign assignment links)
 - Phase 13: Annual renewal + expiry tracking
+
+---
+
+## [2026-05-23] — Phase 10: ML Risk Engine + Behaviour Analytics
+
+**Files Created:**
+-  — BehaviourTracker class; records click/cred/report/ignore per event
+-  — DecisionTreeClassifier wrapper; train_model(), predict(), rule fallback
+-  — 255 synthetic labelled rows (LOW/MEDIUM/HIGH)
+-  — directory for trained .pkl artifact
+-  — full design doc for ML + behaviour layer
+
+**Files Modified:**
+-  — added set_behaviour_tracker(); calls tracker.record() after each choice
+-  — instantiates BehaviourTracker, wires to EventManager, passes to _end_game, passes to run_ai_analysis
+-  — added behaviour: dict param; persists 8 behaviour fields in result JSON
+-  — uses RiskModel instead of RiskPredictor; merges behaviour features; saves ml_source + behaviour summary
+-  — /api/employees now includes click_rate, report_rate, clicked_link etc.; added /api/dept-stats endpoint
+-  — ML Risk Prediction card (risk/confidence/weakness/source); Behaviour Metrics card with bars; updated _populateReport + _populateAI; loadResultsBtn now parallel-fetches /api/results + /api/ai-results
+-  — employees table adds Click Rate + Report Rate columns (8 cols); heatmap screen adds Department Vulnerability real-data table with #deptStatsBody + #mostVulnerable
+-  — loadEmployees updated for 8 cols with click/report rate coloring; added loadDeptStats(); heatmap screen registered via PV.onScreenShow
+
+**What works:**
+- BehaviourTracker records link clicks, credential submits, reports, vishing falls per gameplay session
+- click_rate and report_rate computed per session
+- RiskModel falls back gracefully to rules if no .pkl is trained
+- Employee result JSON now includes all 8 behaviour fields
+- Employee portal report screen shows ML card + behaviour metrics populated from real API
+- Admin employees table has per-employee click/report rates
+- Admin heatmap screen has department-level aggregated vulnerability table
+- All doc files updated
+
+**Train the ML model:**
+    python -m ai.risk_model train
+
+**Next steps:**
+- Phase 12: Multi-employee campaign assignment links
+- Phase 13: Annual renewal + expiry tracking
+
+---
+
+### Phase 11 — Campaigns Page: Real Data (2026-05-23)
+
+**Problem:** Manager portal Campaigns page showed three hardcoded mock cards (Q2 Treasury Cohort, Reception Voice Drills, Marketing Brand Spoof) and two scheduled stubs (Eng USB Drop, HR Bonus Wave). These were static HTML and never reflected what was actually saved in `campaigns/`.
+
+**Fix:**
+- Replaced the entire `div.grid-three` in `#screen-campaigns` with an empty `id="campaignsGrid"` container.
+- Added `PV.loadCampaigns()` to `app.js` — fetches `GET /api/campaigns`, renders one card per real campaign file, appends the "Author a new campaign" add-card at the end.
+- Status derived from `employees.length`: 0 → CREATED (purple), >0 → RUNNING (cyan).
+- Attack type chips mapped from `enabled_events` IDs to human labels via `_EVT_LABELS`.
+- Empty state: "NO CAMPAIGNS CREATED YET" message displayed when folder is empty.
+- Stat tag `id="campaignsStat"` updated dynamically: "N RUNNING · M TOTAL".
+- Registered `PV.onScreenShow('campaigns', PV.loadCampaigns)` — auto-loads on sidebar navigation.
+- Added handler-firing to the local `showScreen()` in `admin.html` so campaigns also reload after the deploy button redirects to the campaigns screen.
+- `PV.loadCampaigns()` called on initial page load alongside `loadOverviewEmployees`.
+
+**Files changed:** `app.js`, `admin.html`, `WEB_INTEGRATION.md`, `DEVLOG.md`, `STATUS.md`
+
+**Single source of truth:** `campaigns/` folder via Flask `/api/campaigns`.

@@ -1,42 +1,70 @@
 """
 PHISHVERSE – ai package
-Public interface: run_ai_analysis(employee_id, risk_summary) -> dict
+Public interface: run_ai_analysis(employee_id, risk_summary, behaviour) -> dict
 
-Orchestrates all three AI modules and saves the result to
-ai_results/{employee_id}_ai.json.
+Pipeline:
+  1. RiskModel (ML Decision Tree — falls back to rules if not trained)
+  2. RecommendationEngine  (training plan)
+  3. ExamGenerator         (topic profile)
+
+Saves result to ai_results/{employee_id}_ai.json.
+Rule engine (RiskEngine) remains source of truth for the main game score.
+ML prediction augments — it adds confidence, weakness, and behaviour context.
 """
 
 import json
 from pathlib import Path
 
-from ai.risk_predictor        import RiskPredictor
+from ai.risk_model            import RiskModel
 from ai.recommendation_engine import RecommendationEngine
 from ai.exam_generator        import ExamGenerator
 
 _RESULTS_DIR = Path("ai_results")
+_ml_model    = RiskModel()   # loaded once at import; falls back to rules if no .pkl
 
 
-def run_ai_analysis(employee_id: str, risk_summary: dict) -> dict:
+def run_ai_analysis(employee_id: str, risk_summary: dict, behaviour: dict | None = None) -> dict:
     """
     Run the full AI analysis pipeline for one employee session.
-    Accepts risk_summary from RiskEngine.summary_dict().
+    risk_summary  – from RiskEngine.summary_dict()
+    behaviour     – from BehaviourTracker.to_dict() (optional)
     Saves ai_results/{employee_id}_ai.json and returns the result dict.
     """
-    predictor  = RiskPredictor()
     rec_engine = RecommendationEngine()
     exam_gen   = ExamGenerator()
 
-    risk_pred  = predictor.predict(risk_summary)
-    rec        = rec_engine.generate_plan(risk_summary)
-    exam_prof  = exam_gen.generate_profile(risk_summary, employee_id)
+    # Build feature dict: rule features + behaviour features
+    features = dict(risk_summary)
+    if behaviour:
+        features.update({
+            "clicked_link":      behaviour.get("clicked_link",      0),
+            "credential_submit": behaviour.get("credential_submit",  0),
+            "reported_attack":   behaviour.get("reported_attack",    0),
+        })
+
+    ml_pred = _ml_model.predict(features)
+    rec     = rec_engine.generate_plan(risk_summary)
+    exam_pr = exam_gen.generate_profile(risk_summary, employee_id)
 
     result = {
-        "employee":         employee_id,
-        "risk":             risk_pred["risk"],
-        "confidence":       risk_pred["confidence"],
-        "weakness":         risk_pred["weakness"],
+        "employee":    employee_id,
+        # ML prediction
+        "risk":        ml_pred["risk"],
+        "confidence":  ml_pred["confidence"],
+        "weakness":    ml_pred["weakness"],
+        "ml_source":   ml_pred["source"],
+        # Behaviour summary
+        "behaviour": {
+            "clicked_link":      (behaviour or {}).get("clicked_link",      0),
+            "credential_submit": (behaviour or {}).get("credential_submit",  0),
+            "reported_attack":   (behaviour or {}).get("reported_attack",    0),
+            "ignored_attack":    (behaviour or {}).get("ignored_attack",     0),
+            "click_rate":        (behaviour or {}).get("click_rate",         0.0),
+            "report_rate":       (behaviour or {}).get("report_rate",        0.0),
+        },
+        # Recommendations
         "recommendation":   rec["training_plan"],
-        "generated_topics": exam_prof["generated_topics"],
+        "generated_topics": exam_pr["generated_topics"],
     }
 
     _RESULTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -44,7 +72,7 @@ def run_ai_analysis(employee_id: str, risk_summary: dict) -> dict:
     with open(path, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, ensure_ascii=False)
 
-    print(f"[AI] Analysis saved → {path}")
+    print(f"[AI] Analysis saved → {path}  (source: {ml_pred['source']})")
     return result
 
 

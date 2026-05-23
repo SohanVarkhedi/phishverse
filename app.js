@@ -398,43 +398,176 @@
   window.PV.loadEmployees = async function () {
     const tbody = document.getElementById('empBody');
     if (!tbody) return;
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">LOADING…</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">LOADING…</td></tr>`;
     try {
       const res  = await fetch(`${BACKEND}/api/employees`);
       const json = await res.json();
       const emps = json.employees || [];
       if (!emps.length) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">NO RECORDS YET — run the game to generate results</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">NO RECORDS YET — run the game to generate results</td></tr>`;
         return;
       }
       tbody.innerHTML = '';
       emps.forEach(e => {
-        const ini     = (e.employee_name || e.employee_id || '?').split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
-        const prog    = e.events_total ? Math.round((e.events_completed / e.events_total) * 100) : 0;
-        const barColor = prog < 50 ? 'var(--red)' : prog < 75 ? 'var(--gold)' : prog === 100 ? 'var(--green)' : 'var(--cyan)';
-        const riskTag  = e.risk === 'LOW' ? 'green' : e.risk === 'MEDIUM' ? 'gold' : e.risk === 'HIGH' || e.risk === 'CRITICAL' ? 'red' : 'muted';
-        const stage    = e.passed ? 'PASSED' : 'IN PROGRESS';
+        const ini      = (e.employee_name || e.employee_id || '?').split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
+        const riskTag  = e.risk === 'LOW' ? 'green' : e.risk === 'MEDIUM' ? 'gold' : e.risk === 'HIGH' ? 'red' : 'muted';
         const stageTag = e.passed ? 'green' : 'cyan';
+        const stage    = e.passed ? 'PASSED' : 'IN PROGRESS';
         const bias     = [
           e.urgency   >= 3 ? 'Urgency'   : null,
           e.authority >= 3 ? 'Authority' : null,
           e.reward    >= 3 ? 'Reward'    : null,
           e.fear      >= 3 ? 'Fear'      : null,
         ].filter(Boolean).join(' · ') || 'Balanced';
+        const clickPct  = Math.round((e.click_rate  || 0) * 100);
+        const reportPct = Math.round((e.report_rate || 0) * 100);
+        const clickCol  = clickPct  >= 50 ? 'var(--red)' : clickPct  >= 25 ? 'var(--gold)' : 'var(--green)';
+        const repCol    = reportPct >= 75 ? 'var(--green)' : reportPct >= 40 ? 'var(--gold)' : 'var(--red)';
         const row = document.createElement('tr');
         row.innerHTML = `
           <td style="padding-left:28px;"><div class="uname"><div class="av" style="background:linear-gradient(135deg,var(--cyan),var(--purple));">${ini}</div><div class="name-block"><div class="nm">${e.employee_name || e.employee_id}</div><div class="em mono" style="font-size:11px;">${e.employee_id}</div></div></div></td>
           <td style="color:var(--muted);">${e.department || '—'}</td>
           <td><span class="mono" style="font-size:11px;color:#C7D0E8;">${bias}</span></td>
-          <td><span class="mini-bar"><i style="width:${prog}%;background:${barColor};"></i></span>${prog}%</td>
+          <td><span class="mono" style="font-size:13px;font-weight:700;color:${clickCol};">${clickPct}%</span></td>
+          <td><span class="mono" style="font-size:13px;font-weight:700;color:${repCol};">${reportPct}%</span></td>
           <td><strong>${e.score}</strong></td>
-          <td><span class="tag ${stageTag}">${stage}</span></td>
-          <td style="padding-right:28px;"><span class="tag ${riskTag}">${e.risk}</span></td>
+          <td><span class="tag ${riskTag}">${e.risk}</span></td>
+          <td style="padding-right:28px;"><span class="tag ${stageTag}">${stage}</span></td>
         `;
         tbody.appendChild(row);
       });
     } catch {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">BACKEND OFFLINE — start python backend/app.py</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">BACKEND OFFLINE — start python backend/app.py</td></tr>`;
+    }
+  };
+
+  // ────────── Department vulnerability stats loader ──────────
+  window.PV.loadDeptStats = async function () {
+    const container = document.getElementById('deptStatsBody');
+    if (!container) return;
+    try {
+      const res  = await fetch(`${BACKEND}/api/dept-stats`);
+      const json = await res.json();
+      const depts = json.departments || [];
+      const mv    = json.most_vulnerable || 'N/A';
+      const mvEl  = document.getElementById('mostVulnerable');
+      if (mvEl) mvEl.textContent = mv;
+      if (!depts.length) {
+        container.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;font-family:var(--font-mono);font-size:12px;">NO DATA YET</td></tr>`;
+        return;
+      }
+      container.innerHTML = '';
+      depts.forEach(d => {
+        const clickPct  = Math.round((d.avg_click_rate  || 0) * 100);
+        const reportPct = Math.round((d.avg_report_rate || 0) * 100);
+        const clickCol  = clickPct  >= 50 ? 'var(--red)' : clickPct  >= 25 ? 'var(--gold)' : 'var(--green)';
+        const repCol    = reportPct >= 75 ? 'var(--green)' : reportPct >= 40 ? 'var(--gold)' : 'var(--red)';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="padding:12px 16px;font-weight:600;">${d.department}</td>
+          <td style="padding:12px 16px;">${d.total_employees}</td>
+          <td style="padding:12px 16px;"><strong>${d.avg_score}</strong></td>
+          <td style="padding:12px 16px;"><span class="mono" style="color:${clickCol};font-weight:700;">${clickPct}%</span></td>
+          <td style="padding:12px 16px;"><span class="mono" style="color:${repCol};font-weight:700;">${reportPct}%</span></td>
+          <td style="padding:12px 16px;"><span class="mono" style="color:var(--red);">${d.high_risk_count}</span> / ${d.total_employees}</td>
+        `;
+        container.appendChild(tr);
+      });
+    } catch { /* backend offline */ }
+  };
+
+  // ────────── Campaign loader ──────────
+  const _EVT_LABELS = {
+    email_phishing: 'Email',
+    qr_phishing:    'QR Phishing',
+    ceo_fraud:      'CEO Fraud',
+    voice_phishing: 'Vishing',
+    hr_authority:   'HR Authority',
+    usb_drop:       'USB Drop',
+  };
+
+  window.PV.loadCampaigns = async function () {
+    const grid = document.getElementById('campaignsGrid');
+    if (!grid) return;
+
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:48px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">LOADING…</div>`;
+
+    try {
+      const res  = await fetch(`${BACKEND}/api/campaigns`);
+      const json = await res.json();
+      const campaigns = json.campaigns || [];
+
+      const stat = document.getElementById('campaignsStat');
+      if (stat) {
+        const running = campaigns.filter(c => (c.employees || []).length > 0).length;
+        stat.textContent = campaigns.length
+          ? `${running} RUNNING · ${campaigns.length} TOTAL`
+          : 'NO CAMPAIGNS';
+      }
+
+      grid.innerHTML = '';
+
+      if (!campaigns.length) {
+        const msg = document.createElement('div');
+        msg.style.cssText = 'grid-column:1/-1;text-align:center;color:var(--muted);padding:32px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;';
+        msg.textContent = 'NO CAMPAIGNS CREATED YET';
+        grid.appendChild(msg);
+      }
+
+      campaigns.forEach(c => {
+        const empCount = (c.employees || []).length;
+        const events   = c.enabled_events || [];
+        const status   = empCount > 0 ? { text: 'RUNNING', cls: 'cyan' } : { text: 'CREATED', cls: 'purple' };
+        const chips    = events.map(e => `<span class="tag muted">${_EVT_LABELS[e] || e}</span>`).join(' ');
+        const passPct  = c.pass_score || 85;
+
+        const article = document.createElement('article');
+        article.className = 'card glow-card';
+        article.innerHTML = `
+          <div class="card-head">
+            <div>
+              <h3>${c.name || c.campaign_id}</h3>
+              <span class="sub">Dept · ${c.department || 'General'}</span>
+            </div>
+            <span class="tag ${status.cls}">${status.text}</span>
+          </div>
+          <div style="margin-bottom:18px;">${chips || '<span class="tag muted">General</span>'}</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+                <span>Pass threshold</span>
+                <span class="mono" style="color:var(--cyan);">${passPct}%</span>
+              </div>
+              <div class="bar"><div class="bar-fill" style="width:${passPct}%"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:0.1em;display:flex;justify-content:space-between;">
+            <span>${empCount} EMPLOYEE${empCount !== 1 ? 'S' : ''} ASSIGNED</span>
+            <span>${c.duration_days || 14} DAYS</span>
+          </div>`;
+        grid.appendChild(article);
+      });
+
+      // "Author a new campaign" add-card always last
+      const addCard = document.createElement('article');
+      addCard.className = 'card';
+      addCard.style.cssText = 'border-style:dashed;cursor:pointer;';
+      addCard.addEventListener('click', () => {
+        if (typeof showScreen !== 'undefined') showScreen('new');
+        else PV.showScreen('new');
+      });
+      addCard.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:24px;">
+          <div style="width:48px;height:48px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;color:var(--cyan);margin-bottom:14px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+          <h3 style="font-size:16px;font-family:var(--font-body);font-weight:500;">Author a new campaign</h3>
+          <p style="font-size:13px;color:var(--muted);margin-top:6px;">AI-generated · industry-aware · ready in 90 seconds.</p>
+        </div>`;
+      grid.appendChild(addCard);
+
+    } catch {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:48px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;">BACKEND OFFLINE — start python backend/app.py</div>`;
     }
   };
 

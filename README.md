@@ -1,115 +1,411 @@
-# PHISHVERSE — Cybersecurity Awareness RPG
+# PHISHVERSE — AI-Driven Cybersecurity Awareness Platform
 
-A **Pokémon Fire Red / Emerald-style** 2D top-down RPG built with **Python + Pygame**.
+PHISHVERSE is an **AI-driven phishing simulation and cybersecurity awareness platform** that transforms traditional awareness training into **experiential learning**.
 
-> Navigate the office. Resist phishing attacks. Protect your Cyber Score.
+Instead of static slides and seminars, employees experience phishing attacks through a **Pokémon-inspired RPG simulation**, behavioural analytics, adaptive learning and enterprise dashboards.
+
+> We do not teach cybersecurity through reading.  
+> We teach it through simulation.
 
 ---
 
-## 🕹️ How to Run
+# Architecture Overview
 
-```bash
-pip install pygame
-python main.py
+```text
+Manager Portal
+      ↓
+Campaign Creation
+      ↓
+Employee Assignment
+      ↓
+PHISHVERSE RPG (Entrance Exam)
+      ↓
+Behaviour Analytics
+      ↓
+AI + ML Risk Analysis
+      ↓
+Adaptive Training
+      ↓
+Semester Report
+      ↓
+Final Exam
+      ↓
+Certification
 ```
 
 ---
 
-## 🎮 Controls
+# Features
 
-| Key | Action |
-|-----|--------|
-| `WASD` / `Arrow Keys` | Move player |
-| `E` / `Enter` | Interact with object / Confirm dialog choice |
-| `↑` / `↓` in dialog | Navigate choices |
-| `ESC` | Pause menu |
-| `Q` / `ESC` (Report) | Quit game |
+## Employee Portal
+
+Employee lifecycle:
+
+```text
+Registration
+↓
+Campaign Selection
+↓
+Entrance Exam (PHISHVERSE RPG)
+↓
+AI Analysis
+↓
+Lectures
+↓
+Semester Report
+↓
+Final MCQ
+↓
+Cyber Resilience Certificate
+```
+
+### Modules
+
+- Employee Registration
+- Campaign Assignment
+- RPG Simulation
+- AI Training Engine
+- Semester Report
+- Final Assessment
+- Certification
 
 ---
 
-## 🗺️ Map Layout
+## Manager Portal
 
-```
+Organization dashboard for monitoring awareness cycles.
+
+Features:
+
+- Campaign Management
+- Employee Monitoring
+- Department Risk Heatmaps
+- AI Reports
+- MCQ Analytics
+- Threat Intelligence
+- Campaign Analytics
+- Organizational Vulnerability Tracking
+
+---
+
+# PHISHVERSE RPG — Entrance Exam
+
+The RPG acts as the **behaviour assessment engine**.
+
+Employees enter an office environment and experience realistic phishing simulations.
+
+Map:
+
+```text
 ┌─────────────────────────────────────────┐
-│             ENTRY / OUTSIDE             │
+│ ENTRY / OUTSIDE                         │
 ├─────────────────────────────────────────┤
-│               RECEPTION                 │
+│ RECEPTION                               │
 ├─────────────────┬───────────────────────┤
-│   WORK AREA     │        HR ROOM        │
+│ WORK AREA       │ HR ROOM               │
 ├─────────────────┼───────────────────────┤
-│   CAFETERIA     │    MEETING ROOM       │
+│ CAFETERIA       │ MEETING ROOM          │
 ├─────────────────┴───────────────────────┤
-│            IT SUPPORT DESK              │
+│ IT SUPPORT DESK                         │
 └─────────────────────────────────────────┘
 ```
 
-Player spawns at **Entry** (top) and walks south through the building.
+---
+
+# Attack Simulations
+
+| Event | Attack Type | Behaviour Target |
+|--------|------------|------------------|
+| Email Phishing | Urgency Manipulation | Urgency Bias |
+| QR Phishing | Reward Manipulation | Reward Bias |
+| USB Drop Attack | Curiosity Bait | Reward / Curiosity |
+| HR Authority Attack | Fake Authority | Authority Bias |
+| Vishing | Fear + Authority | Fear Bias |
+| CEO Fraud / BEC | Executive Manipulation | Authority Bias |
 
 ---
 
-## ⚠️ Cybersecurity Events
+# Behaviour Analytics
 
-| # | Event | Location | Attack Type |
-|---|-------|----------|-------------|
-| 1 | Email Phishing (Password Reset) | Work Area — Computer | Urgency Manipulation |
-| 2 | QR Code Phishing | Cafeteria — Poster | Reward Manipulation |
-| 3 | USB Drop Attack | Entry — Floor | Curiosity Bait |
-| 4 | HR Authority Message | HR Room — Computer | Authority Phishing |
-| 5 | Voice Phishing (Vishing) | HR Room — Phone | Authority + Fear |
-| 6 | CEO Fraud / BEC (BOSS) | Meeting Room | BEC Attack |
+PHISHVERSE tracks employee behaviour rather than only correctness.
 
----
+Metrics:
 
-## 📊 Player Stats
+```text
+score
 
-| Stat | Description |
-|------|-------------|
-| `score` | Starts at 100; decreases on wrong choices |
-| `urgency_bias` | Susceptibility to time-pressure attacks |
-| `authority_bias` | Susceptibility to fake authority |
-| `reward_bias` | Susceptibility to free-prize lures |
-| `fear_bias` | Susceptibility to fear-based threats |
+urgency_bias
 
----
+authority_bias
 
-## 🏁 Ending
+reward_bias
 
-Complete all 6 events → **Cyber Resilience Report** is generated showing:
-- Final Score
-- Bias breakdown (animated bars)
-- Risk Level: `LOW` / `MEDIUM` / `HIGH`
-- Weakest Area
-- Personalised Recommendation
-- Cyber Awareness Certificate
+fear_bias
 
----
+clicked_link
 
-## 📁 Project Structure
+credential_submit
 
+reported_attack
+
+ignored_attack
 ```
+
+---
+
+# AI + ML Layer
+
+Current AI stack:
+
+## Rule-Based Behaviour Engine
+
+Adaptive recommendations:
+
+```text
+reward high
+↓
+QR awareness
+
+authority high
+↓
+CEO fraud awareness
+```
+
+---
+
+## ML Risk Prediction
+
+Model:
+
+```python
+DecisionTreeClassifier
+```
+
+Input:
+
+```text
+score
+
+urgency
+
+authority
+
+reward
+
+fear
+
+clicked_link
+
+credential_submit
+
+reported_attack
+
+campaign
+
+department
+```
+
+Output:
+
+```text
+LOW
+
+MEDIUM
+
+HIGH
+```
+
+Example:
+
+```json
+{
+ "risk":"HIGH",
+ "confidence":0.84,
+ "weakness":"authority"
+}
+```
+
+---
+
+# Semester Report
+
+Generated after training cycle completion.
+
+Contains:
+
+- Cyber Score
+- Behaviour Profile
+- Risk Level
+- Weakness Detection
+- AI Recommendation
+- Training Progress
+- Cyber Maturity Index
+
+---
+
+# Final Exam + Certification
+
+Employees undergo adaptive MCQ assessment.
+
+Pass:
+
+Cyber Resilience Certificate generated.
+
+Fail:
+
+Training cycle repeats.
+
+---
+
+# Project Structure
+
+```text
 PHISHVERSE/
-├── main.py           ← Game loop, state machine
-├── constants.py      ← All config & colours
-├── player.py         ← Tile movement, sprite
-├── map.py            ← 40×33 office tile grid
-├── tiles.py          ← Procedural pixel-art tile renderer
-├── npc.py            ← NPC characters & dialogue
-├── dialogue.py       ← Pokémon-style dialog box
-├── events.py         ← Event definitions loader
-├── event_manager.py  ← Event lifecycle orchestrator
-├── risk_engine.py    ← Score tracking & risk assessment
-├── ui.py             ← HUD, pause menu, title screen
-├── report.py         ← Final Cyber Resilience Report
-├── data/
-│   └── events.json   ← All 6 event definitions (JSON)
-└── requirements.txt
+
+game/
+
+ai/
+ └── risk_model.py
+
+analytics/
+ └── behaviour_tracker.py
+
+training/
+
+exam/
+
+reporting/
+
+backend/
+
+manager/
+
+campaigns/
+
+employee_reports/
+
+exam_results/
+
+ai_results/
+
+website/
+ ├── index.html
+ ├── employee.html
+ ├── admin.html
+ ├── styles.css
+ └── app.js
+
+docs/
+
+README.md
+requirements.txt
 ```
 
 ---
 
-## 🔧 Technical Notes
+# Tech Stack
 
-- **No external assets required** — all tiles and sprites are procedurally drawn with `pygame` primitives
-- **OOP architecture** — each system is a separate module
-- **JSON-driven events** — add new events by editing `data/events.json`
-- Tested with **Python 3.13 + pygame 2.6.1**
+Frontend:
+
+- HTML
+- CSS
+- JavaScript
+
+Game Engine:
+
+- Python
+- Pygame
+
+Backend:
+
+- Flask
+
+AI / ML:
+
+- Scikit-learn
+- Decision Trees
+
+Data:
+
+- JSON
+- CSV
+
+---
+
+# Installation
+
+Clone:
+
+```bash
+git clone https://github.com/<username>/phishverse.git
+
+cd phishverse
+```
+
+Install:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run backend:
+
+```bash
+python backend/app.py
+```
+
+Run website:
+
+```bash
+python -m http.server 8000
+```
+
+Launch:
+
+```text
+http://localhost:8000
+```
+
+---
+
+# Problem Statement Coverage
+
+✅ Configurable phishing campaigns
+
+✅ AI-powered analytics
+
+✅ Department risk dashboards
+
+✅ Automated awareness workflows
+
+✅ Secure campaign monitoring
+
+✅ Adaptive training engine
+
+✅ ML risk prediction
+
+---
+
+# Future Roadmap
+
+- Live Campaign Assignment
+- Game → Portal Synchronization
+- Department Intelligence
+- Multi-Cycle Learning
+- Cloud Deployment
+- Advanced ML Models
+- Enterprise Integration
+
+---
+
+# Team
+
+PHISHVERSE Team
+
+Track:
+
+Cybersecurity & Blockchain
+
+Problem Statement:
+
+AI-Driven Phishing Attack Simulation and Cyber Awareness Training Platform
